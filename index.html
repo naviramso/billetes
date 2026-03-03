@@ -7,8 +7,9 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta name="theme-color" content="#c8102e" />
-    <title>Verificador Billetes Bolivia</title>
+    <title>Verificador Billetes Bolivia · Rápido</title>
     <style>
+      /* (Mantén los mismos estilos que en el original) */
       @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap");
       :root {
         --rojo: #c8102e;
@@ -32,7 +33,6 @@
         font-family: "Source Sans 3", sans-serif;
         min-height: 100vh;
       }
-
       .hdr {
         background: linear-gradient(150deg, #b8001c, #720012);
         padding: 14px 16px 12px;
@@ -99,7 +99,6 @@
           opacity: 0.1;
         }
       }
-
       .tabs {
         display: flex;
         background: #111;
@@ -128,7 +127,6 @@
         color: var(--amarillo);
         border-bottom-color: var(--amarillo);
       }
-
       .content {
         padding: 14px 13px 32px;
       }
@@ -254,7 +252,7 @@
         transform: scale(0.98);
       }
 
-      /* PROGRESO OCR */
+      /* PROGRESO OCR (simplificado) */
       .ocr-prog {
         display: none;
         background: var(--card);
@@ -294,7 +292,7 @@
         min-height: 16px;
       }
 
-      /* DEBUG: mostrar texto OCR detectado */
+      /* DEBUG: mostrar texto OCR */
       .ocr-debug {
         background: rgba(0, 0, 0, 0.4);
         border: 1px solid var(--border);
@@ -411,7 +409,7 @@
         color: var(--txt);
       }
 
-      /* Corrección manual si OCR falla */
+      /* Corrección manual */
       .corr-box {
         background: var(--card);
         border: 1px solid var(--border);
@@ -430,10 +428,10 @@
         color: var(--dim);
         margin-bottom: 8px;
       }
-      .corr-grid {
+      .corr-denom-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
         margin-bottom: 10px;
       }
       .corr-denom-btn {
@@ -462,12 +460,6 @@
       }
       .corr-denom-btn.on .cm {
         color: var(--amarillo);
-      }
-      .corr-denom-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 7px;
-        margin-bottom: 10px;
       }
       .corr-inp {
         width: 100%;
@@ -530,7 +522,7 @@
         background: rgba(242, 169, 0, 0.1);
       }
 
-      /* MANUAL */
+      /* MANUAL (igual que original) */
       .lbl {
         font-family: "Oswald", sans-serif;
         font-size: 10px;
@@ -645,7 +637,7 @@
         transform: scale(0.98);
       }
 
-      /* REFERENCIA */
+      /* REFERENCIA (igual) */
       .rbadge {
         background: var(--card);
         border: 1px solid var(--border);
@@ -787,7 +779,7 @@
           🔍 Leer y Verificar
         </button>
 
-        <!-- Progreso OCR -->
+        <!-- Progreso OCR (simplificado) -->
         <div class="ocr-prog" id="ocrProg">
           <div class="prog-label">
             <span class="sp"></span><span id="progLbl">Iniciando...</span>
@@ -798,19 +790,19 @@
           <div class="prog-txt" id="progTxt"></div>
         </div>
 
-        <!-- Texto OCR crudo (debug/transparencia) -->
+        <!-- Texto OCR crudo (debug) -->
         <div class="ocr-debug" id="ocrDebug">
-          <div class="ocr-debug-lbl">Texto detectado por OCR</div>
+          <div class="ocr-debug-lbl">Texto detectado</div>
           <div class="ocr-raw" id="ocrRaw"></div>
         </div>
 
         <!-- Resultado automático -->
         <div class="result" id="rFoto"></div>
 
-        <!-- Corrección manual si OCR no detectó bien -->
+        <!-- Corrección manual -->
         <div class="corr-box" id="corrBox">
           <div class="corr-lbl">¿No es correcto? Corrige aquí:</div>
-          <div class="corr-lbl" style="margin-top: 4px">Denominación</div>
+          <div class="corr-lbl">Denominación</div>
           <div class="corr-denom-grid">
             <div class="corr-denom-btn" onclick="setCorrDenom(50, this)">
               <div class="cm">50</div>
@@ -843,7 +835,7 @@
         </button>
       </div>
 
-      <!-- MANUAL -->
+      <!-- MANUAL (igual) -->
       <div id="p-man" class="panel">
         <div class="lbl">1. Denominación</div>
         <div class="dg">
@@ -876,7 +868,7 @@
         <div class="result" id="rMan"></div>
       </div>
 
-      <!-- REFERENCIA -->
+      <!-- REFERENCIA (igual) -->
       <div id="p-ref" class="panel">
         <div class="rbadge">
           <strong>CP9/2026</strong> · BCB · Serie B sin valor legal. Si el
@@ -927,7 +919,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
       // ================================================================
-      // RANGOS INVÁLIDOS CP9/2026
+      // RANGOS INVÁLIDOS CP9/2026 (igual que original)
       // ================================================================
       const R = {
         50: [
@@ -977,29 +969,31 @@
       };
       const esInv = (d, n) => (R[d] || []).some(([a, b]) => n >= a && n <= b);
 
-      let imgData = null,
-        dMan = null,
-        corrDenom = null;
+      // ================================================================
+      // VARIABLES GLOBALES
+      // ================================================================
+      let imgData = null;
+      let dMan = null;
+      let corrDenom = null;
       let ocrWorker = null;
 
-      // Precargar Tesseract al inicio (en background)
+      // Precarga del worker Tesseract (en segundo plano)
       (async () => {
         try {
           ocrWorker = await Tesseract.createWorker("eng", 1, {
             logger: () => {},
           });
         } catch (e) {
-          console.warn("Tesseract precarga fallida, se reintentará al usar");
+          console.warn("Error precargando Tesseract:", e);
         }
       })();
 
       // ================================================================
-      // FOTO
+      // FUNCIONES DE INTERFAZ (cámara, galería, etc.) - igual que original
       // ================================================================
       function abrirCam() {
         document.getElementById("fileIn").click();
       }
-
       function abrirGaleria() {
         const t = document.createElement("input");
         t.type = "file";
@@ -1007,11 +1001,9 @@
         t.onchange = (e) => onFotoFile(e.target.files[0]);
         t.click();
       }
-
       function onFoto(input) {
         if (input.files[0]) onFotoFile(input.files[0]);
       }
-
       function onFotoFile(file) {
         if (!file) return;
         const reader = new FileReader();
@@ -1023,12 +1015,10 @@
           document.getElementById("fzp").style.display = "none";
           document.getElementById("fz").classList.add("has");
           document.getElementById("btnVer").classList.add("show");
-          // Limpiar resultados anteriores
           resetResultados();
         };
         reader.readAsDataURL(file);
       }
-
       function resetResultados() {
         document.getElementById("rFoto").className = "result";
         document.getElementById("rFoto").innerHTML = "";
@@ -1037,9 +1027,24 @@
         document.getElementById("ocrDebug").className = "ocr-debug";
         document.getElementById("ocrProg").className = "ocr-prog";
       }
+      function nuevaFoto() {
+        imgData = null;
+        document.getElementById("fileIn").value = "";
+        document.getElementById("prev").src = "";
+        document.getElementById("prev").style.display = "none";
+        document.getElementById("fzp").style.display = "flex";
+        document.getElementById("fz").classList.remove("has");
+        document.getElementById("btnVer").classList.remove("show");
+        resetResultados();
+      }
+      function setProgreso(pct, lbl, txt = "") {
+        document.getElementById("progBar").style.width = pct + "%";
+        document.getElementById("progLbl").textContent = lbl;
+        if (txt) document.getElementById("progTxt").textContent = txt;
+      }
 
       // ================================================================
-      // PROCESAMIENTO PRINCIPAL
+      // PROCESAMIENTO PRINCIPAL OPTIMIZADO
       // ================================================================
       async function procesarFoto() {
         if (!imgData) {
@@ -1051,54 +1056,108 @@
         btnVer.disabled = true;
         resetResultados();
 
-        // Mostrar barra de progreso
-        document.getElementById("ocrProg").className = "ocr-prog show";
-        setProgreso(5, "Cargando imagen...");
+        // Mostrar progreso
+        document.getElementById("ocrProg").classList.add("show");
+        setProgreso(5, "Preparando imagen...");
 
         try {
-          // 1. Cargar imagen en canvas
+          // 1. Cargar imagen
           const img = await cargarImagen(imgData);
-          setProgreso(15, "Preprocesando imagen...");
+          setProgreso(20, "Buscando número de serie...");
 
-          // 2. Generar múltiples versiones preprocesadas
-          const versiones = preprocesarImagen(img);
-          setProgreso(35, "Ejecutando OCR...");
+          // 2. Redimensionar a 800px de ancho (suficiente para OCR)
+          const cv = document.getElementById("cv");
+          const ctx = cv.getContext("2d", { willReadFrequently: true });
+          const W = 800;
+          const scale = W / img.naturalWidth;
+          const H = Math.round(img.naturalHeight * scale);
+          cv.width = W;
+          cv.height = H;
+          ctx.drawImage(img, 0, 0, W, H);
 
-          // 3. Iniciar worker si no está listo
+          // 3. Recortar franja inferior (donde suele estar el número de serie en billetes bolivianos)
+          //    Ajusta estos valores si es necesario: 60% - 85% de la altura
+          const sy = Math.floor(H * 0.6);
+          const sh = Math.floor(H * 0.25); // altura de la franja
+          const sub = ctx.getImageData(0, sy, W, sh);
+
+          // 4. Crear canvas para la franja
+          const cropCanvas = document.createElement("canvas");
+          cropCanvas.width = W;
+          cropCanvas.height = sh;
+          const ctxCrop = cropCanvas.getContext("2d");
+          ctxCrop.putImageData(sub, 0, 0);
+
+          // 5. Preprocesamiento rápido: escala de grises + umbral simple (fijo 128)
+          //    (Otsu es más costoso, usamos uno fijo para velocidad)
+          setProgreso(40, "Mejorando contraste...");
+          const imgDataCrop = ctxCrop.getImageData(0, 0, W, sh);
+          const data = imgDataCrop.data;
+          for (let i = 0; i < data.length; i += 4) {
+            // Convertir a gris
+            const g = Math.round(
+              0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2],
+            );
+            // Umbral fijo 128 (blanco/negro)
+            const b = g > 128 ? 255 : 0;
+            data[i] = data[i + 1] = data[i + 2] = b;
+          }
+          ctxCrop.putImageData(imgDataCrop, 0, 0);
+
+          // 6. Ejecutar OCR (un solo intento, PSM 7 = línea de texto, solo dígitos)
+          setProgreso(60, "Leyendo número...");
           if (!ocrWorker) {
-            setProgreso(20, "Iniciando motor OCR...");
+            setProgreso(60, "Iniciando OCR...");
             ocrWorker = await Tesseract.createWorker("eng", 1, {
               logger: () => {},
             });
           }
+          await ocrWorker.setParameters({
+            tessedit_char_whitelist: "0123456789", // solo dígitos
+            tessedit_pageseg_mode: "7", // tratar como línea de texto
+          });
+          const {
+            data: { text },
+          } = await ocrWorker.recognize(cropCanvas.toDataURL());
 
-          // 4. Ejecutar OCR en múltiples versiones y combinar resultados
-          const textos = await ejecutarOCR(versiones, setProgreso);
-          setProgreso(85, "Extrayendo datos...");
+          setProgreso(85, "Verificando...");
+          // Extraer solo dígitos del texto OCR
+          const serieStr = text.replace(/\D/g, "");
+          const serie = serieStr ? parseInt(serieStr) : null;
 
-          // 5. Extraer número de serie y denominación del texto
-          const resultado = extraerDatos(textos);
+          // Mostrar texto crudo para depuración
+          document.getElementById("ocrRaw").textContent = text || "(vacío)";
+          document.getElementById("ocrDebug").classList.add("show");
+
+          // Inferir denominación (opcional: podría intentarse desde el texto original, pero lo dejamos en null)
+          // En un entorno real, podrías buscar palabras como "CINCUENTA" en el texto completo,
+          // pero para simplificar, se pedirá al usuario que corrija si es necesario.
+          let denom = null;
+          // Intento básico: si el número está en rangos cercanos a alguna denominación
+          if (serie) {
+            for (const d of [50, 20, 10]) {
+              if (
+                (R[d] || []).some(
+                  ([a, b]) => serie >= a - 2000000 && serie <= b + 2000000,
+                )
+              ) {
+                denom = d;
+                break;
+              }
+            }
+          }
+
           setProgreso(100, "Listo");
-
-          // Mostrar texto crudo para transparencia
-          document.getElementById("ocrRaw").textContent = textos
-            .join("\n---\n")
-            .substring(0, 500);
-          document.getElementById("ocrDebug").className = "ocr-debug show";
-
-          // 6. Mostrar resultado
           setTimeout(() => {
-            document.getElementById("ocrProg").className = "ocr-prog";
-            mostrarResultado(resultado);
+            document.getElementById("ocrProg").classList.remove("show");
+            mostrarResultado({ serie, denom, esSB: true, textoCompleto: text });
             btnVer.disabled = false;
-          }, 400);
+          }, 200);
         } catch (e) {
           console.error(e);
-          setProgreso(100, "Error: " + e.message);
-          document.getElementById("ocrProg").className = "ocr-prog";
-          mostrarResultado({
-            error: "No se pudo procesar la imagen: " + e.message,
-          });
+          setProgreso(100, "Error");
+          document.getElementById("ocrProg").classList.remove("show");
+          mostrarResultado({ error: "Error al procesar: " + e.message });
           btnVer.disabled = false;
         }
       }
@@ -1116,300 +1175,7 @@
       }
 
       // ================================================================
-      // PREPROCESAMIENTO — genera varias versiones optimizadas para OCR
-      // ================================================================
-      function preprocesarImagen(imgEl) {
-        const cv = document.getElementById("cv");
-        const ctx = cv.getContext("2d", { willReadFrequently: true });
-        const versiones = [];
-
-        // Escalar a ancho fijo 1600px (mejor balance resolución/velocidad)
-        const W = 1600;
-        const scale = W / imgEl.naturalWidth;
-        const H = Math.round(imgEl.naturalHeight * scale);
-        cv.width = W;
-        cv.height = H;
-        ctx.drawImage(imgEl, 0, 0, W, H);
-
-        // --- VERSION 1: Imagen completa en escala de grises con contraste alto ---
-        {
-          const d = ctx.getImageData(0, 0, W, H);
-          aplicarGris(d);
-          aumentarContraste(d, 60);
-          ctx.putImageData(d, 0, 0);
-          versiones.push(cv.toDataURL("image/png"));
-        }
-
-        // --- VERSION 2: Solo franja inferior izquierda (número de serie en billetes bolivianos) ---
-        // El número de serie está en la parte inferior izquierda y superior derecha
-        ctx.drawImage(imgEl, 0, 0, W, H);
-        {
-          // Franja completa horizontal del 65% inferior hasta el 85% vertical
-          const sy = Math.floor(H * 0.6),
-            sh = Math.floor(H * 0.28);
-          const sub = ctx.getImageData(0, sy, W, sh);
-          const cv2 = crearCanvas(W * 2, sh * 2);
-          const ctx2 = cv2.getContext("2d");
-          // Escalar x2 para más detalle
-          const tmp = document.createElement("canvas");
-          tmp.width = W;
-          tmp.height = sh;
-          tmp.getContext("2d").putImageData(sub, 0, 0);
-          ctx2.drawImage(tmp, 0, 0, W * 2, sh * 2);
-          const d2 = ctx2.getImageData(0, 0, W * 2, sh * 2);
-          aplicarGris(d2);
-          umbralOtsu(d2);
-          ctx2.putImageData(d2, 0, 0);
-          versiones.push(cv2.toDataURL("image/png"));
-        }
-
-        // --- VERSION 3: Franja superior derecha (número de serie también aparece ahí) ---
-        ctx.drawImage(imgEl, 0, 0, W, H);
-        {
-          const sy = Math.floor(H * 0.04),
-            sh = Math.floor(H * 0.22);
-          const sx = Math.floor(W * 0.45);
-          const sub = ctx.getImageData(sx, sy, W - sx, sh);
-          const cw = (W - sx) * 2,
-            ch = sh * 2;
-          const cv2 = crearCanvas(cw, ch);
-          const ctx2 = cv2.getContext("2d");
-          const tmp = document.createElement("canvas");
-          tmp.width = W - sx;
-          tmp.height = sh;
-          tmp.getContext("2d").putImageData(sub, 0, 0);
-          ctx2.drawImage(tmp, 0, 0, cw, ch);
-          const d2 = ctx2.getImageData(0, 0, cw, ch);
-          aplicarGris(d2);
-          umbralOtsu(d2);
-          ctx2.putImageData(d2, 0, 0);
-          versiones.push(cv2.toDataURL("image/png"));
-        }
-
-        // --- VERSION 4: Imagen completa binarizada (umbral Otsu) ---
-        ctx.drawImage(imgEl, 0, 0, W, H);
-        {
-          const d = ctx.getImageData(0, 0, W, H);
-          aplicarGris(d);
-          umbralOtsu(d);
-          ctx.putImageData(d, 0, 0);
-          versiones.push(cv.toDataURL("image/png"));
-        }
-
-        // --- VERSION 5: Invertida (fondo oscuro, texto claro) ---
-        ctx.drawImage(imgEl, 0, 0, W, H);
-        {
-          const d = ctx.getImageData(0, 0, W, H);
-          aplicarGris(d);
-          umbralOtsu(d);
-          invertir(d);
-          ctx.putImageData(d, 0, 0);
-          versiones.push(cv.toDataURL("image/png"));
-        }
-
-        return versiones;
-      }
-
-      function crearCanvas(w, h) {
-        const c = document.createElement("canvas");
-        c.width = w;
-        c.height = h;
-        return c;
-      }
-
-      function aplicarGris(imgd) {
-        const d = imgd.data;
-        for (let i = 0; i < d.length; i += 4) {
-          const g = Math.round(
-            0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2],
-          );
-          d[i] = d[i + 1] = d[i + 2] = g;
-        }
-      }
-
-      function aumentarContraste(imgd, factor) {
-        const d = imgd.data,
-          f = (259 * (factor + 255)) / (255 * (259 - factor));
-        for (let i = 0; i < d.length; i += 4) {
-          d[i] = clamp(f * (d[i] - 128) + 128);
-          d[i + 1] = clamp(f * (d[i + 1] - 128) + 128);
-          d[i + 2] = clamp(f * (d[i + 2] - 128) + 128);
-        }
-      }
-
-      function umbralOtsu(imgd) {
-        const d = imgd.data,
-          n = d.length / 4;
-        const hist = new Int32Array(256);
-        for (let i = 0; i < n; i++) hist[d[i * 4]]++;
-        let sum = 0;
-        for (let i = 0; i < 256; i++) sum += i * hist[i];
-        let wB = 0,
-          sumB = 0,
-          max = 0,
-          thr = 128;
-        for (let t = 0; t < 256; t++) {
-          wB += hist[t];
-          if (!wB) continue;
-          const wF = n - wB;
-          if (!wF) break;
-          sumB += t * hist[t];
-          const mB = sumB / wB,
-            mF = (sum - sumB) / wF;
-          const s = wB * wF * (mB - mF) * (mB - mF);
-          if (s > max) {
-            max = s;
-            thr = t;
-          }
-        }
-        for (let i = 0; i < d.length; i += 4) {
-          const v = d[i] > thr ? 255 : 0;
-          d[i] = d[i + 1] = d[i + 2] = v;
-        }
-      }
-
-      function invertir(imgd) {
-        const d = imgd.data;
-        for (let i = 0; i < d.length; i += 4) {
-          d[i] = 255 - d[i];
-          d[i + 1] = 255 - d[i + 1];
-          d[i + 2] = 255 - d[i + 2];
-        }
-      }
-
-      function clamp(v) {
-        return Math.max(0, Math.min(255, Math.round(v)));
-      }
-
-      // ================================================================
-      // OCR — ejecutar en múltiples versiones con configuraciones distintas
-      // ================================================================
-      async function ejecutarOCR(versiones, onProg) {
-        const textos = [];
-        // Configuraciones a probar: PSM 3 (auto), PSM 6 (bloque), PSM 11 (texto disperso)
-        const configs = [
-          {
-            psm: "3",
-            whitelist:
-              "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ",
-          },
-          { psm: "6", whitelist: "0123456789 B" },
-          {
-            psm: "11",
-            whitelist:
-              "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ",
-          },
-        ];
-
-        const total = versiones.length * configs.length;
-        let done = 0;
-
-        for (const ver of versiones) {
-          for (const cfg of configs) {
-            try {
-              await ocrWorker.setParameters({
-                tessedit_char_whitelist: cfg.whitelist,
-                tessedit_pageseg_mode: cfg.psm,
-              });
-              const {
-                data: { text },
-              } = await ocrWorker.recognize(ver);
-              if (text.trim()) textos.push(text);
-            } catch (e) {
-              console.warn("OCR versión falló:", e);
-            }
-            done++;
-            onProg(
-              35 + Math.round((done / total) * 50),
-              "Analizando (" + done + "/" + total + ")...",
-            );
-          }
-        }
-
-        return textos;
-      }
-
-      // ================================================================
-      // EXTRACCIÓN DE DATOS — buscar número de serie y denominación
-      // ================================================================
-      function extraerDatos(textos) {
-        const todo = textos.join(" ").replace(/\n/g, " ");
-
-        // ---- NÚMERO DE SERIE ----
-        // Patrón principal: 8-9 dígitos seguido de espacio y B (o precedido de B)
-        // Ejemplos reales: "87280145 B", "B 91646549", "96650001B"
-        let serie = null;
-
-        // Patrón 1: número seguido de B o b
-        const p1 = todo.match(/\b(\d{7,9})\s*[Bb]\b/g) || [];
-        // Patrón 2: B seguido de número
-        const p2 = todo.match(/\b[Bb]\s*(\d{7,9})\b/g) || [];
-        // Patrón 3: cualquier secuencia de 8-9 dígitos
-        const p3 = todo.match(/\b\d{8,9}\b/g) || [];
-
-        // Combinar candidatos
-        const candidatos = [];
-        [...p1, ...p2].forEach((m) => {
-          const n = parseInt(m.replace(/[^0-9]/g, ""));
-          if (n > 10000000) candidatos.push(n);
-        });
-        p3.forEach((m) => {
-          const n = parseInt(m);
-          if (n > 10000000) candidatos.push(n);
-        });
-
-        if (candidatos.length > 0) {
-          // Priorizar el que coincida con algún rango conocido
-          for (const n of candidatos) {
-            for (const d of [50, 20, 10]) {
-              if (esInv(d, n)) {
-                serie = n;
-                break;
-              }
-            }
-            if (serie) break;
-          }
-          // Si ninguno coincide, tomar el primero válido
-          if (!serie) serie = candidatos[0];
-        }
-
-        // ---- DENOMINACIÓN ----
-        let denom = null;
-
-        // Buscar patrones de denominación en el texto
-        // Billetes bolivianos tienen texto como "CINCUENTA BOLIVIANOS", "VEINTE", "DIEZ"
-        if (/CINCUENTA|cincuenta|50/.test(todo)) denom = 50;
-        else if (/VEINTE|veinte|20/.test(todo)) denom = 20;
-        else if (/DIEZ|diez|10/.test(todo)) denom = 10;
-
-        // Si no encontró por texto, inferir desde el número de serie
-        if (!denom && serie) {
-          for (const d of [50, 20, 10]) {
-            // Chequear si el número está en rango o cercano a algún rango
-            if (
-              (R[d] || []).some(
-                ([a, b]) => serie >= a - 2000000 && serie <= b + 2000000,
-              )
-            ) {
-              denom = d;
-              break;
-            }
-          }
-        }
-
-        // ---- DETECTAR SERIE B ----
-        // Buscar la letra B cerca del número de serie
-        const esSB =
-          todo.includes(" B ") ||
-          todo.includes("B ") ||
-          /\d\s*B/.test(todo) ||
-          /B\s*\d/.test(todo);
-
-        return { serie, denom, esSB, textoCompleto: todo };
-      }
-
-      // ================================================================
-      // MOSTRAR RESULTADO
+      // MOSTRAR RESULTADO (similar al original, con manejo de denominación)
       // ================================================================
       function mostrarResultado(datos) {
         const el = document.getElementById("rFoto");
@@ -1417,23 +1183,22 @@
         if (datos.error) {
           el.className = "result warn";
           el.innerHTML = `<div class="r-ico">⚠️</div><div class="r-ttl">Error</div><div class="r-txt">${datos.error}</div>`;
-          document.getElementById("corrBox").className = "corr-box show";
-          document.getElementById("btnNueva").className = "btn-nueva show";
+          document.getElementById("corrBox").classList.add("show");
+          document.getElementById("btnNueva").classList.add("show");
           return;
         }
 
         const { serie, denom, esSB } = datos;
 
-        // No se pudo leer
         if (!serie) {
           el.className = "result warn";
-          el.innerHTML = `<div class="r-ico">🔍</div><div class="r-ttl">No se pudo leer</div><div class="r-txt">El OCR no detectó el número de serie.<br>Intenta con mejor iluminación, más cerca, o ingresa el número manualmente abajo.</div>`;
-          document.getElementById("corrBox").className = "corr-box show";
-          document.getElementById("btnNueva").className = "btn-nueva show";
+          el.innerHTML = `<div class="r-ico">🔍</div><div class="r-ttl">No se pudo leer</div><div class="r-txt">El OCR no detectó el número de serie.<br>Ingresa el número manualmente abajo.</div>`;
+          document.getElementById("corrBox").classList.add("show");
+          document.getElementById("btnNueva").classList.add("show");
           return;
         }
 
-        // Prellenar corrección manual con lo que se detectó
+        // Prellenar corrección manual con lo detectado
         if (denom) preselectCorrDenom(denom);
         document.getElementById("corrInp").value = serie;
 
@@ -1442,36 +1207,36 @@
         if (invalido) {
           el.className = "result bad";
           el.innerHTML = `
-      <div class="r-ico">⛔</div>
-      <div class="r-ttl">BILLETE INVÁLIDO</div>
-      <div class="r-txt">Este billete <strong>NO tiene valor legal</strong>.<br>Número de serie anulado por el BCB según CP9/2026.</div>
-      <div class="r-ficha">
-        <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom}</span></div>
-        <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div>
-        <div class="r-row"><span class="r-key">Serie</span><span class="r-val">B ❌</span></div>
-        <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO CP9/2026</span></div>
-      </div>`;
+          <div class="r-ico">⛔</div>
+          <div class="r-ttl">BILLETE INVÁLIDO</div>
+          <div class="r-txt">Este billete <strong>NO tiene valor legal</strong>.<br>Número de serie anulado por el BCB según CP9/2026.</div>
+          <div class="r-ficha">
+            <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom}</span></div>
+            <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div>
+            <div class="r-row"><span class="r-key">Serie</span><span class="r-val">B ❌</span></div>
+            <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO CP9/2026</span></div>
+          </div>`;
         } else {
           el.className = "result ok";
           el.innerHTML = `
-      <div class="r-ico">✅</div>
-      <div class="r-ttl">BILLETE VÁLIDO</div>
-      <div class="r-txt">Este número no aparece en la lista de billetes anulados del CP9/2026.</div>
-      <div class="r-ficha">
-        <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom || "?"}</span></div>
-        <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div>
-        <div class="r-row"><span class="r-key">Serie</span><span class="r-val">B ✓</span></div>
-        <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#50ffaa">VÁLIDO</span></div>
-      </div>`;
+          <div class="r-ico">✅</div>
+          <div class="r-ttl">BILLETE VÁLIDO</div>
+          <div class="r-txt">Este número no aparece en la lista de billetes anulados del CP9/2026.</div>
+          <div class="r-ficha">
+            <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom || "?"}</span></div>
+            <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div>
+            <div class="r-row"><span class="r-key">Serie</span><span class="r-val">B ✓</span></div>
+            <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#50ffaa">VÁLIDO</span></div>
+          </div>`;
         }
 
-        document.getElementById("corrBox").className = "corr-box show";
-        document.getElementById("btnNueva").className = "btn-nueva show";
+        document.getElementById("corrBox").classList.add("show");
+        document.getElementById("btnNueva").classList.add("show");
         el.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
       // ================================================================
-      // CORRECCIÓN MANUAL
+      // CORRECCIÓN MANUAL (igual)
       // ================================================================
       function setCorrDenom(v, el) {
         corrDenom = v;
@@ -1499,8 +1264,8 @@
           alert("Ingresa el número de serie");
           return;
         }
-        const serie = parseInt(val),
-          denom = corrDenom;
+        const serie = parseInt(val);
+        const denom = corrDenom;
         const inv = esInv(denom, serie);
         const el = document.getElementById("rFoto");
         el.className = "result " + (inv ? "bad" : "ok");
@@ -1510,25 +1275,8 @@
         el.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
-      function nuevaFoto() {
-        imgData = null;
-        document.getElementById("fileIn").value = "";
-        document.getElementById("prev").src = "";
-        document.getElementById("prev").style.display = "none";
-        document.getElementById("fzp").style.display = "flex";
-        document.getElementById("fz").classList.remove("has");
-        document.getElementById("btnVer").classList.remove("show");
-        resetResultados();
-      }
-
-      function setProgreso(pct, lbl, txt = "") {
-        document.getElementById("progBar").style.width = pct + "%";
-        document.getElementById("progLbl").textContent = lbl;
-        if (txt) document.getElementById("progTxt").textContent = txt;
-      }
-
       // ================================================================
-      // MANUAL
+      // MANUAL (igual)
       // ================================================================
       function sd(v, el) {
         dMan = v;
@@ -1553,9 +1301,9 @@
           alert("Ingresa el número de serie");
           return;
         }
-        const d = dMan,
-          s = parseInt(val),
-          inv = esInv(d, s);
+        const d = dMan;
+        const s = parseInt(val);
+        const inv = esInv(d, s);
         const el = document.getElementById("rMan");
         el.className = "result " + (inv ? "bad" : "ok");
         el.innerHTML = inv
@@ -1580,7 +1328,7 @@
       }
 
       // ================================================================
-      // TABLA REFERENCIA
+      // TABLA REFERENCIA (igual)
       // ================================================================
       [50, 20, 10].forEach((d) => {
         const tb = document.getElementById("tb" + d);
