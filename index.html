@@ -1,647 +1,1459 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#c8102e">
-<title>Verificador Billetes Bolivia</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap');
-:root{
-  --rojo:#c8102e;--amarillo:#f2a900;--verde:#007a3d;
-  --negro:#0a0a0a;--gris-oscuro:#1a1a1a;--gris-medio:#2d2d2d;
-  --gris-claro:#3d3d3d;--texto:#f0ebe0;--texto-dim:#9a9080;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--negro);color:var(--texto);font-family:'Source Sans 3',sans-serif;min-height:100vh;overflow-x:hidden;}
-
-.header{background:linear-gradient(135deg,#c8102e,#7a0018);padding:16px 18px 14px;position:relative;overflow:hidden;}
-.header::after{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:var(--amarillo);opacity:.1;border-radius:50%;}
-.header-top{display:flex;align-items:center;gap:10px;margin-bottom:5px;position:relative;z-index:1;}
-.header h1{font-family:'Oswald',sans-serif;font-size:19px;font-weight:700;line-height:1.1;}
-.header h1 small{display:block;font-size:11px;font-weight:400;letter-spacing:2px;opacity:.8;text-transform:uppercase;}
-.alerta{background:rgba(0,0,0,.3);border-left:3px solid var(--amarillo);padding:6px 10px;border-radius:0 6px 6px 0;font-size:11px;color:#ffd97a;line-height:1.4;position:relative;z-index:1;}
-.live-dot{display:inline-block;width:7px;height:7px;background:var(--rojo);border-radius:50%;margin-right:5px;animation:blink 1.2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-.tabs{display:flex;background:var(--gris-oscuro);border-bottom:1px solid #333;}
-.tab{flex:1;padding:11px 4px;text-align:center;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--texto-dim);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;user-select:none;}
-.tab.active{color:var(--amarillo);border-bottom-color:var(--amarillo);}
-.tab-icon{display:block;font-size:18px;margin-bottom:1px;}
-
-.content{padding:14px 12px;}
-.panel{display:none;}.panel.active{display:block;}
-
-/* ===== CÁMARA ===== */
-.cam-wrap{
-  position:relative;border-radius:14px;overflow:hidden;
-  background:#000;margin-bottom:10px;
-  aspect-ratio:16/9;
-}
-#video{width:100%;height:100%;object-fit:cover;display:block;}
-
-/* Zona de escaneo centrada */
-.scan-zone{
-  position:absolute;
-  left:6%;right:6%;
-  top:50%;transform:translateY(-50%);
-  height:48px;
-  border:2px solid var(--amarillo);
-  border-radius:6px;
-  pointer-events:none;
-  box-shadow:0 0 0 2000px rgba(0,0,0,.4);
-}
-.scan-line{
-  position:absolute;left:4px;right:4px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--amarillo),transparent);
-  box-shadow:0 0 6px var(--amarillo);
-  animation:scanMove 1.6s ease-in-out infinite;
-}
-@keyframes scanMove{0%{top:4px;opacity:1}90%{opacity:1}100%{top:40px;opacity:0}}
-.scan-corner{position:absolute;width:12px;height:12px;border-color:var(--amarillo);border-style:solid;}
-.sc-tl{top:-2px;left:-2px;border-width:2px 0 0 2px;}
-.sc-tr{top:-2px;right:-2px;border-width:2px 2px 0 0;}
-.sc-bl{bottom:-2px;left:-2px;border-width:0 0 2px 2px;}
-.sc-br{bottom:-2px;right:-2px;border-width:0 2px 2px 0;}
-.scan-label{
-  position:absolute;bottom:-22px;left:0;right:0;
-  text-align:center;font-size:10px;color:rgba(242,169,0,.8);
-  letter-spacing:1.5px;text-transform:uppercase;
-}
-
-/* Badge resultado flotante */
-.cam-result-badge{
-  position:absolute;top:8px;left:50%;transform:translateX(-50%);
-  padding:5px 18px;border-radius:20px;
-  font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;
-  white-space:nowrap;backdrop-filter:blur(10px);
-  transition:all .3s;opacity:0;pointer-events:none;
-}
-.cam-result-badge.show{opacity:1;}
-.cam-result-badge.valido{background:rgba(0,90,40,.85);border:1.5px solid var(--verde);color:#4dff9b;}
-.cam-result-badge.invalido{background:rgba(120,0,20,.85);border:1.5px solid var(--rojo);color:#ff7070;animation:shake .35s ease;}
-@keyframes shake{0%,100%{transform:translateX(-50%)}30%{transform:translateX(calc(-50% - 5px))}70%{transform:translateX(calc(-50% + 5px))}}
-
-/* Chips denom/serie sobre el video */
-.cam-chips{position:absolute;bottom:8px;left:8px;right:8px;display:flex;gap:6px;pointer-events:none;}
-.chip{
-  background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
-  border-radius:6px;padding:3px 10px;
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;
-  border:1px solid rgba(255,255,255,.15);color:#ccc;
-  max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  transition:all .3s;
-}
-.chip.hit{border-color:var(--amarillo);color:var(--amarillo);}
-
-/* Botón cámara */
-.btn-cam{
-  width:100%;border:none;border-radius:12px;padding:13px;
-  font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-  transition:all .2s;margin-bottom:10px;
-}
-.btn-cam.on{background:linear-gradient(135deg,var(--rojo),#900018);color:white;box-shadow:0 3px 16px rgba(200,16,46,.4);}
-.btn-cam.off{background:var(--gris-medio);border:2px solid var(--gris-claro);color:var(--texto-dim);}
-.btn-cam:active{transform:scale(.97);}
-
-/* Status bar */
-.status-bar{
-  background:var(--gris-oscuro);border:1px solid #333;border-radius:10px;
-  padding:10px 12px;margin-bottom:10px;
-  font-size:12px;color:var(--texto-dim);line-height:1.5;
-  min-height:42px;display:flex;align-items:center;gap:8px;
-}
-.status-bar .s-icon{font-size:18px;flex-shrink:0;}
-
-/* Tarjetas de detección */
-.detect-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.detect-card{background:var(--gris-medio);border:1px solid var(--gris-claro);border-radius:12px;padding:10px 12px;transition:border-color .3s;}
-.detect-card.hit{border-color:var(--amarillo);}
-.dc-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-dim);margin-bottom:4px;}
-.dc-val{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:var(--texto);letter-spacing:2px;min-height:28px;}
-.dc-val.hit{color:var(--amarillo);}
-
-/* Resultado */
-.resultado{border-radius:14px;padding:16px;text-align:center;display:none;animation:pop .3s ease;margin-bottom:4px;}
-@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-.resultado.valido{background:linear-gradient(135deg,rgba(0,122,61,.2),rgba(0,60,30,.15));border:2px solid var(--verde);display:block;}
-.resultado.invalido{background:linear-gradient(135deg,rgba(200,16,46,.2),rgba(100,0,16,.15));border:2px solid var(--rojo);display:block;}
-.res-icon{font-size:44px;line-height:1;margin-bottom:6px;}
-.res-title{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;}
-.resultado.valido .res-title{color:#4dff9b;}
-.resultado.invalido .res-title{color:#ff6b6b;}
-.res-detail{font-size:13px;line-height:1.5;color:var(--texto-dim);}
-.res-serie{background:rgba(0,0,0,.3);border-radius:7px;padding:6px 12px;margin-top:9px;font-family:'Oswald',sans-serif;font-size:17px;letter-spacing:3px;color:var(--texto);}
-
-/* ===== MANUAL ===== */
-.denom-label{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-dim);margin-bottom:9px;}
-.denom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
-.denom-btn{background:var(--gris-medio);border:2px solid var(--gris-claro);border-radius:12px;padding:14px 8px;cursor:pointer;text-align:center;transition:all .2s;user-select:none;}
-.denom-btn:active{transform:scale(.96);}
-.denom-btn.sel{background:rgba(242,169,0,.13);border-color:var(--amarillo);}
-.denom-btn .monto{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:var(--texto);line-height:1;}
-.denom-btn.sel .monto{color:var(--amarillo);}
-.denom-btn .bs{font-size:11px;color:var(--texto-dim);letter-spacing:1px;}
-.input-label{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-dim);margin-bottom:7px;}
-.iw{position:relative;margin-bottom:13px;}
-.serie-input{width:100%;background:var(--gris-medio);border:2px solid var(--gris-claro);border-radius:12px;padding:13px 44px 13px 15px;font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;letter-spacing:4px;color:var(--texto);outline:none;transition:border-color .2s;-webkit-appearance:none;}
-.serie-input:focus{border-color:var(--amarillo);}
-.serie-input::placeholder{color:var(--gris-claro);letter-spacing:2px;}
-.xbtn{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:var(--gris-claro);border:none;border-radius:50%;width:26px;height:26px;color:var(--texto-dim);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.xbtn:active{background:var(--rojo);color:white;}
-.vbtn{width:100%;background:linear-gradient(135deg,var(--rojo),#900018);border:none;border-radius:12px;padding:14px;font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:white;cursor:pointer;box-shadow:0 3px 16px rgba(200,16,46,.4);margin-bottom:14px;transition:all .2s;}
-.vbtn:active{transform:scale(.98);}
-
-/* ===== REFERENCIA ===== */
-.cp-badge{background:var(--gris-medio);border:1px solid var(--gris-claro);border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:var(--texto-dim);line-height:1.6;}
-.cp-badge strong{color:var(--amarillo);}
-.ref-denom{margin-bottom:16px;}
-.ref-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;margin-bottom:7px;padding:7px 10px;border-radius:8px;}
-.ref-title.b50{background:rgba(200,16,46,.18);color:#ff7070;}
-.ref-title.b20{background:rgba(0,122,61,.18);color:#4dff9b;}
-.ref-title.b10{background:rgba(242,169,0,.18);color:var(--amarillo);}
-.ref-table{width:100%;border-collapse:collapse;}
-.ref-table th{background:var(--gris-medio);padding:7px 9px;text-align:left;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-dim);}
-.ref-table td{padding:6px 9px;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.04);}
-.ref-table tr:last-child td{border-bottom:none;}
-
-/* spinner */
-.sp{display:inline-block;width:11px;height:11px;border:2px solid rgba(242,169,0,.25);border-top-color:var(--amarillo);border-radius:50%;animation:spin .65s linear infinite;vertical-align:middle;margin-right:5px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-canvas{display:none;}
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div class="header-top">
-    <span style="font-size:26px">🇧🇴</span>
-    <h1>Verificador Billetes<small>Serie B · Sin Valor Legal · CP9/2026</small></h1>
-  </div>
-  <div class="alerta"><span class="live-dot"></span><strong>28 feb 2026</strong> — Billetes Serie B sin valor legal circulando. Verifica antes de aceptar.</div>
-</div>
-
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('camara')"><span class="tab-icon">📷</span>Cámara</div>
-  <div class="tab" onclick="switchTab('manual')"><span class="tab-icon">⌨️</span>Manual</div>
-  <div class="tab" onclick="switchTab('referencia')"><span class="tab-icon">📋</span>Series</div>
-</div>
-
-<div class="content">
-
-<!-- ===== CÁMARA ===== -->
-<div id="panel-camara" class="panel active">
-  <div class="cam-wrap" id="camWrap">
-    <video id="video" autoplay playsinline muted></video>
-
-    <div class="scan-zone" id="scanZone" style="display:none">
-      <div class="scan-line"></div>
-      <div class="scan-corner sc-tl"></div>
-      <div class="scan-corner sc-tr"></div>
-      <div class="scan-corner sc-bl"></div>
-      <div class="scan-corner sc-br"></div>
-      <div class="scan-label">Número de serie aquí</div>
-    </div>
-
-    <div class="cam-result-badge" id="camBadge"></div>
-
-    <div class="cam-chips">
-      <div class="chip" id="chipDenom">Denominación: —</div>
-      <div class="chip" id="chipSerie">Serie: —</div>
-    </div>
-  </div>
-
-  <button class="btn-cam on" id="btnCam" onclick="toggleCam()">📷 Activar Cámara</button>
-
-  <div class="status-bar" id="statusBar">
-    <span class="s-icon">💡</span>
-    <span id="statusTxt">Activa la cámara y apunta el billete al área marcada.</span>
-  </div>
-
-  <div class="detect-cards">
-    <div class="detect-card" id="cardDenom">
-      <div class="dc-label">Denominación</div>
-      <div class="dc-val" id="dcDenom">—</div>
-    </div>
-    <div class="detect-card" id="cardSerie">
-      <div class="dc-label">Número de Serie</div>
-      <div class="dc-val" id="dcSerie">—</div>
-    </div>
-  </div>
-
-  <div class="resultado" id="resultadoCam"></div>
-</div>
-
-<!-- ===== MANUAL ===== -->
-<div id="panel-manual" class="panel">
-  <div class="denom-label">1. Selecciona la denominación</div>
-  <div class="denom-grid">
-    <div class="denom-btn" onclick="selDenom(50,this)"><div class="monto">50</div><div class="bs">Bs.</div></div>
-    <div class="denom-btn" onclick="selDenom(20,this)"><div class="monto">20</div><div class="bs">Bs.</div></div>
-    <div class="denom-btn" onclick="selDenom(10,this)"><div class="monto">10</div><div class="bs">Bs.</div></div>
-  </div>
-  <div class="input-label">2. Ingresa el número de serie</div>
-  <div class="iw">
-    <input type="number" class="serie-input" id="serieInput" placeholder="00000000"
-      oninput="this.value=this.value.slice(0,9)"
-      onkeydown="if(event.key==='Enter')verificarManual()">
-    <button class="xbtn" onclick="clearManual()">✕</button>
-  </div>
-  <button class="vbtn" onclick="verificarManual()">✓ Verificar Billete</button>
-  <div class="resultado" id="resultadoManual"></div>
-</div>
-
-<!-- ===== REFERENCIA ===== -->
-<div id="panel-referencia" class="panel">
-  <div class="cp-badge"><strong>CP9/2026</strong> · Banco Central de Bolivia · <strong>Serie B sin valor legal</strong>. Si el número cae en estos rangos, el billete es inválido.</div>
-  <div class="ref-denom"><div class="ref-title b50">💴 Bs. 50</div><table class="ref-table"><thead><tr><th>Desde</th><th>Hasta</th></tr></thead><tbody id="t50"></tbody></table></div>
-  <div class="ref-denom"><div class="ref-title b20">💵 Bs. 20</div><table class="ref-table"><thead><tr><th>Desde</th><th>Hasta</th></tr></thead><tbody id="t20"></tbody></table></div>
-  <div class="ref-denom"><div class="ref-title b10">💶 Bs. 10</div><table class="ref-table"><thead><tr><th>Desde</th><th>Hasta</th></tr></thead><tbody id="t10"></tbody></table></div>
-</div>
-
-</div>
-<canvas id="c"></canvas>
-
-<!-- Tesseract v5 más estable -->
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script>
-// ============================================================
-// RANGOS CP9/2026
-// ============================================================
-const R = {
-  50:[[67250001,67700000],[69050001,69500000],[69500001,69950000],[69950001,70400000],[70400001,70850000],[70850001,71300000],[76310012,85139995],[86400001,86850000],[90900001,91350000],[91800001,92250000]],
-  20:[[87280145,91646549],[96650001,97100000],[99800001,100250000],[100250001,100700000],[109250001,109700000],[110600001,111050000],[111050001,111500000],[111950001,112400000],[112400001,112850000],[112850001,113300000],[114200001,114650000],[114650001,115100000],[115100001,115550000],[118700001,119150000],[119150001,119600000],[120500001,120950000]],
-  10:[[77100001,77550000],[78000001,78450000],[78900001,96350000],[96350001,96800000],[96800001,97250000],[98150001,98600000],[104900001,105350000],[105350001,105800000],[106700001,107150000],[107600001,108050000],[108050001,108500000],[109400001,109850000]]
-};
-
-const esInvalido = (d,n) => (R[d]||[]).some(([a,b])=>n>=a&&n<=b);
-
-// ============================================================
-// ESTADO
-// ============================================================
-let stream = null;
-let worker = null;
-let workerReady = false;
-let scanning = false;
-let loopTimer = null;
-let dManual = null;
-
-// Confirmación: acumular lecturas iguales antes de mostrar resultado
-let lastKey = '';
-let lastKeyCount = 0;
-
-// ============================================================
-// CÁMARA
-// ============================================================
-async function toggleCam() {
-  stream ? stopCam() : startCam();
-}
-
-async function startCam() {
-  const btn = document.getElementById('btnCam');
-  btn.textContent = '⏳ Iniciando cámara...';
-  btn.disabled = true;
-
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: {ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} },
-      audio: false
-    });
-
-    const vid = document.getElementById('video');
-    vid.srcObject = stream;
-
-    // Esperar a que el video esté listo
-    await new Promise(res => {
-      vid.onloadedmetadata = () => { vid.play(); res(); };
-    });
-
-    document.getElementById('scanZone').style.display = 'block';
-    btn.textContent = '⏹ Detener';
-    btn.className = 'btn-cam off';
-    btn.disabled = false;
-
-    setStatus('sp', 'Cargando motor de reconocimiento...');
-    await initWorker();
-    setStatus('sp', 'Escaneando... Apunta el número de serie al área marcada.');
-    startLoop();
-
-  } catch(e) {
-    console.error('CAM ERROR:', e);
-    btn.textContent = '📷 Activar Cámara';
-    btn.className = 'btn-cam on';
-    btn.disabled = false;
-    setStatus('⚠️', 'Error al acceder a la cámara: ' + e.message + '. Usa el modo Manual.');
-  }
-}
-
-function stopCam() {
-  stopLoop();
-  if (stream) { stream.getTracks().forEach(t=>t.stop()); stream = null; }
-  if (worker) { worker.terminate(); worker = null; workerReady = false; }
-
-  document.getElementById('video').srcObject = null;
-  document.getElementById('scanZone').style.display = 'none';
-  document.getElementById('btnCam').textContent = '📷 Activar Cámara';
-  document.getElementById('btnCam').className = 'btn-cam on';
-  document.getElementById('btnCam').disabled = false;
-  resetDetection();
-  setStatus('💡', 'Activa la cámara y apunta el billete al área marcada.');
-}
-
-// ============================================================
-// WORKER OCR
-// ============================================================
-async function initWorker() {
-  try {
-    // Tesseract v5 API
-    worker = await Tesseract.createWorker('eng', 1, {
-      workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-      corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd-lstm.wasm.js',
-      langPath: 'https://tessdata.projectnaptha.com/4.0.0',
-      logger: () => {}
-    });
-    await worker.setParameters({
-      tessedit_char_whitelist: '0123456789 B',
-      tessedit_pageseg_mode: '7', // línea de texto única — perfecto para número de serie
-    });
-    workerReady = true;
-  } catch(e) {
-    console.error('Worker init error:', e);
-    // Fallback: intentar con defaults
-    try {
-      worker = await Tesseract.createWorker('eng');
-      await worker.setParameters({ tessedit_char_whitelist: '0123456789 B', tessedit_pageseg_mode: '7' });
-      workerReady = true;
-    } catch(e2) {
-      setStatus('⚠️', 'OCR no disponible. Usa el modo Manual.');
-    }
-  }
-}
-
-// ============================================================
-// LOOP DE ESCANEO
-// ============================================================
-function startLoop() {
-  loopTimer = setInterval(doScan, 1500);
-}
-function stopLoop() {
-  if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
-  scanning = false;
-}
-
-async function doScan() {
-  if (scanning || !workerReady || !stream) return;
-  scanning = true;
-
-  try {
-    const vid = document.getElementById('video');
-    const vw = vid.videoWidth, vh = vid.videoHeight;
-    if (!vw || !vh) { scanning = false; return; }
-
-    const c = document.getElementById('c');
-    const ctx = c.getContext('2d');
-
-    // — ZONA 1: franja central para número de serie (zona amarilla)
-    // Coordenadas relativas a la zona visible en pantalla: 35-65% vertical, 6-94% horizontal
-    const zx = Math.floor(vw * 0.04);
-    const zy = Math.floor(vh * 0.33);
-    const zw = Math.floor(vw * 0.92);
-    const zh = Math.floor(vh * 0.34);
-
-    c.width = zw * 2; // escalar x2 ayuda al OCR
-    c.height = zh * 2;
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(vid, zx, zy, zw, zh, 0, 0, c.width, c.height);
-
-    // Pre-procesamiento: escala de grises + umbralización fuerte
-    const imgData = ctx.getImageData(0, 0, c.width, c.height);
-    const px = imgData.data;
-    for (let i = 0; i < px.length; i += 4) {
-      const g = 0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2];
-      // Umbral Otsu simplificado: blanco/negro
-      const v = g > 128 ? 255 : 0;
-      px[i] = px[i+1] = px[i+2] = v;
-      px[i+3] = 255;
-    }
-    ctx.putImageData(imgData, 0, 0);
-
-    const { data: { text: textSerie } } = await worker.recognize(c);
-
-    // — ZONA 2: esquina superior derecha para denominación (donde aparece "50 B", "20 B" etc.)
-    const dx = Math.floor(vw * 0.55);
-    const dy = Math.floor(vh * 0.02);
-    const dw = Math.floor(vw * 0.42);
-    const dh = Math.floor(vh * 0.35);
-
-    c.width = dw; c.height = dh;
-    ctx.drawImage(vid, dx, dy, dw, dh, 0, 0, dw, dh);
-
-    const imgData2 = ctx.getImageData(0, 0, dw, dh);
-    const px2 = imgData2.data;
-    for (let i = 0; i < px2.length; i += 4) {
-      const g = 0.299*px2[i] + 0.587*px2[i+1] + 0.114*px2[i+2];
-      const v = g > 120 ? 255 : 0;
-      px2[i] = px2[i+1] = px2[i+2] = v;
-    }
-    ctx.putImageData(imgData2, 0, 0);
-
-    const { data: { text: textDenom } } = await worker.recognize(c);
-
-    // Procesar resultados
-    const serie = parseSerie(textSerie);
-    const denom = parseDenom(textSerie + ' ' + textDenom);
-
-    handleDetection(denom, serie);
-
-  } catch(e) {
-    console.error('Scan error:', e);
-  }
-
-  scanning = false;
-}
-
-// ============================================================
-// PARSERS
-// ============================================================
-function parseSerie(txt) {
-  // Limpiar caracteres raros, dejar dígitos y espacios
-  const clean = txt.replace(/[^0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-  // Buscar secuencias de 7-9 dígitos
-  const nums = clean.match(/\d{7,9}/g);
-  if (!nums) return null;
-  // Priorizar el más largo y que sea > 1,000,000
-  const valid = nums.filter(n => parseInt(n) > 1000000);
-  if (!valid.length) return null;
-  return parseInt(valid.sort((a,b) => b.length - a.length)[0]);
-}
-
-function parseDenom(txt) {
-  const t = txt.replace(/[^0-9]/g, ' ').replace(/\s+/g, ' ').trim();
-  const nums = t.match(/\b\d{1,3}\b/g) || [];
-  // Contar frecuencia de 10, 20, 50
-  let c = {10:0, 20:0, 50:0};
-  nums.forEach(n => { const v=parseInt(n); if(c[v]!==undefined) c[v]++; });
-  const max = Math.max(c[10], c[20], c[50]);
-  if (max === 0) return null;
-  return parseInt(Object.keys(c).find(k => c[k] === max));
-}
-
-// ============================================================
-// ACTUALIZAR UI
-// ============================================================
-function handleDetection(denom, serie) {
-  // Actualizar chips y tarjetas
-  if (denom) {
-    document.getElementById('chipDenom').textContent = 'Bs. ' + denom;
-    document.getElementById('chipDenom').className = 'chip hit';
-    document.getElementById('dcDenom').textContent = 'Bs. ' + denom;
-    document.getElementById('dcDenom').className = 'dc-val hit';
-    document.getElementById('cardDenom').className = 'detect-card hit';
-  }
-  if (serie) {
-    document.getElementById('chipSerie').textContent = '' + serie;
-    document.getElementById('chipSerie').className = 'chip hit';
-    document.getElementById('dcSerie').textContent = '' + serie;
-    document.getElementById('dcSerie').className = 'dc-val hit';
-    document.getElementById('cardSerie').className = 'detect-card hit';
-  }
-
-  if (!denom && !serie) {
-    setStatus('sp', 'Escaneando... Apunta el número de serie al área marcada.');
-    return;
-  }
-  if (!denom) {
-    setStatus('sp', 'Serie detectada: <strong>' + serie + '</strong> — Buscando denominación...');
-    return;
-  }
-  if (!serie) {
-    setStatus('sp', 'Bs.' + denom + ' detectado — Buscando número de serie...');
-    return;
-  }
-
-  // Tenemos ambos — confirmar con 2 lecturas iguales
-  const key = denom + '-' + serie;
-  if (key === lastKey) {
-    lastKeyCount++;
-  } else {
-    lastKey = key;
-    lastKeyCount = 1;
-    setStatus('sp', 'Detectado: Bs.' + denom + ' · ' + serie + ' — Confirmando...');
-    return;
-  }
-
-  if (lastKeyCount >= 2) {
-    const inv = esInvalido(denom, serie);
-    // Badge en video
-    const badge = document.getElementById('camBadge');
-    badge.textContent = inv ? '⛔ INVÁLIDO' : '✅ VÁLIDO';
-    badge.className = 'cam-result-badge show ' + (inv ? 'invalido' : 'valido');
-
-    // Resultado completo
-    mostrarResultado('resultadoCam', denom, serie);
-
-    setStatus(inv ? '⛔' : '✅',
-      inv
-        ? '<strong style="color:#ff7070">BILLETE INVÁLIDO</strong> — Bs.' + denom + ' · Serie ' + serie
-        : '<strong style="color:#4dff9b">BILLETE VÁLIDO</strong> — Bs.' + denom + ' · Serie ' + serie
-    );
-
-    // Pausar escaneo 3 segundos para que se pueda leer el resultado
-    stopLoop();
-    setTimeout(() => {
-      if (stream) {
-        lastKey = ''; lastKeyCount = 0;
-        startLoop();
-        setStatus('sp', 'Escaneando siguiente billete...');
-        badge.className = 'cam-result-badge';
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#c8102e" />
+    <title>Verificador Billetes Bolivia</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap");
+      :root {
+        --rojo: #c8102e;
+        --amarillo: #f2a900;
+        --verde: #00a651;
+        --bg: #0d0d0d;
+        --card: #1c1c1c;
+        --border: #2a2a2a;
+        --txt: #f0ebe0;
+        --dim: #6e6660;
       }
-    }, 3500);
-  }
-}
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        background: var(--bg);
+        color: var(--txt);
+        font-family: "Source Sans 3", sans-serif;
+        min-height: 100vh;
+      }
 
-function resetDetection() {
-  lastKey = ''; lastKeyCount = 0;
-  ['chipDenom','chipSerie'].forEach(id => {
-    document.getElementById(id).className = 'chip';
-    document.getElementById(id).textContent = id==='chipDenom' ? 'Denominación: —' : 'Serie: —';
-  });
-  ['dcDenom','dcSerie'].forEach(id => { document.getElementById(id).textContent = '—'; document.getElementById(id).className = 'dc-val'; });
-  ['cardDenom','cardSerie'].forEach(id => document.getElementById(id).className = 'detect-card');
-  document.getElementById('camBadge').className = 'cam-result-badge';
-  const r = document.getElementById('resultadoCam');
-  r.className = 'resultado'; r.innerHTML = '';
-}
+      /* HEADER */
+      .hdr {
+        background: linear-gradient(150deg, #b8001c, #720012);
+        padding: 14px 16px 12px;
+        overflow: hidden;
+        position: relative;
+      }
+      .hdr::after {
+        content: "";
+        position: absolute;
+        right: -15px;
+        top: -15px;
+        width: 90px;
+        height: 90px;
+        background: var(--amarillo);
+        opacity: 0.09;
+        border-radius: 50%;
+      }
+      .hdr-r {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        position: relative;
+      }
+      .hdr h1 {
+        font-family: "Oswald", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+      .hdr h1 em {
+        display: block;
+        font-style: normal;
+        font-size: 10px;
+        font-weight: 400;
+        letter-spacing: 2px;
+        opacity: 0.7;
+        text-transform: uppercase;
+      }
+      .alerta {
+        margin-top: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        border-left: 3px solid var(--amarillo);
+        padding: 5px 9px;
+        border-radius: 0 5px 5px 0;
+        font-size: 11px;
+        color: #ffd060;
+        line-height: 1.4;
+      }
+      .dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: var(--rojo);
+        border-radius: 50%;
+        margin-right: 5px;
+        animation: bk 1s infinite;
+      }
+      @keyframes bk {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.1;
+        }
+      }
 
-function setStatus(icon, msg) {
-  const bar = document.getElementById('statusBar');
-  const sp = icon === 'sp' ? '<span class="sp"></span>' : '<span class="s-icon">' + icon + '</span>';
-  bar.innerHTML = sp + '<span>' + msg + '</span>';
-}
+      /* TABS */
+      .tabs {
+        display: flex;
+        background: #111;
+        border-bottom: 1px solid var(--border);
+      }
+      .tab {
+        flex: 1;
+        padding: 10px 4px 9px;
+        text-align: center;
+        cursor: pointer;
+        color: var(--dim);
+        font-family: "Oswald", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        border-bottom: 2.5px solid transparent;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .tab .ti {
+        display: block;
+        font-size: 17px;
+        margin-bottom: 2px;
+      }
+      .tab.on {
+        color: var(--amarillo);
+        border-bottom-color: var(--amarillo);
+      }
 
-// ============================================================
-// RESULTADO
-// ============================================================
-function mostrarResultado(id, denom, serie) {
-  const el = document.getElementById(id);
-  const inv = esInvalido(denom, serie);
-  el.className = 'resultado ' + (inv ? 'invalido' : 'valido');
-  el.innerHTML = inv
-    ? `<div class="res-icon">⛔</div><div class="res-title">BILLETE INVÁLIDO</div>
-       <div class="res-detail">Este billete <strong>NO tiene valor legal</strong>.<br>Número de serie anulado por el BCB según CP9/2026.</div>
-       <div class="res-serie">Bs.${denom} &nbsp;·&nbsp; Nº ${serie}</div>`
-    : `<div class="res-icon">✅</div><div class="res-title">BILLETE VÁLIDO</div>
-       <div class="res-detail">Este número no aparece en la lista de billetes anulados del CP9/2026.</div>
-       <div class="res-serie">Bs.${denom} &nbsp;·&nbsp; Nº ${serie}</div>`;
-  el.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
+      .content {
+        padding: 12px 12px 28px;
+      }
+      .panel {
+        display: none;
+      }
+      .panel.on {
+        display: block;
+      }
 
-// ============================================================
-// PANEL MANUAL
-// ============================================================
-function selDenom(v, el) {
-  dManual = v;
-  document.querySelectorAll('#panel-manual .denom-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-}
-function clearManual() {
-  document.getElementById('serieInput').value = '';
-  document.getElementById('serieInput').focus();
-  const r = document.getElementById('resultadoManual');
-  r.className = 'resultado'; r.innerHTML = '';
-}
-function verificarManual() {
-  const val = document.getElementById('serieInput').value.trim();
-  if (!dManual) { alert('⚠️ Selecciona la denominación'); return; }
-  if (!val) { alert('⚠️ Ingresa el número de serie'); return; }
-  mostrarResultado('resultadoManual', dManual, parseInt(val));
-}
+      /* ====== CÁMARA ====== */
+      .cam-box {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #000;
+        margin-bottom: 10px;
+        aspect-ratio: 4/3;
+      }
+      #vid {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
 
-// ============================================================
-// TABS
-// ============================================================
-function switchTab(name) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  ['camara','manual','referencia'].forEach((n,i) => {
-    if (n === name) document.querySelectorAll('.tab')[i].classList.add('active');
-  });
-  if (name !== 'camara' && stream) stopCam();
-}
+      /* Overlays */
+      .ov {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.52);
+        pointer-events: none;
+      }
+      .ov-t {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 28%;
+      }
+      .ov-b {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 28%;
+      }
+      .ov-l {
+        top: 28%;
+        bottom: 28%;
+        left: 0;
+        width: 6%;
+      }
+      .ov-r {
+        top: 28%;
+        bottom: 28%;
+        right: 0;
+        width: 6%;
+      }
 
-// ============================================================
-// TABLA REFERENCIA
-// ============================================================
-[50,20,10].forEach(d => {
-  const tb = document.getElementById('t'+d);
-  R[d].forEach(([a,b]) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${a.toLocaleString()}</td><td>${b.toLocaleString()}</td>`;
-    tb.appendChild(tr);
-  });
-});
-</script>
-</body>
+      /* Marco escaneo */
+      #sf {
+        position: absolute;
+        left: 6%;
+        right: 6%;
+        top: 28%;
+        bottom: 28%;
+        border: 2px solid var(--amarillo);
+        border-radius: 6px;
+        pointer-events: none;
+        display: none;
+      }
+      .sfl {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--amarillo) 30%,
+          #fff 50%,
+          var(--amarillo) 70%,
+          transparent
+        );
+        box-shadow: 0 0 7px rgba(242, 169, 0, 0.7);
+        animation: sw 1.3s ease-in-out infinite alternate;
+      }
+      @keyframes sw {
+        from {
+          top: 3px;
+        }
+        to {
+          top: calc(100% - 5px);
+        }
+      }
+      .corner {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        border-color: var(--amarillo);
+        border-style: solid;
+      }
+      .tl {
+        top: -1px;
+        left: -1px;
+        border-width: 2px 0 0 2px;
+      }
+      .tr {
+        top: -1px;
+        right: -1px;
+        border-width: 2px 2px 0 0;
+      }
+      .bl {
+        bottom: -1px;
+        left: -1px;
+        border-width: 0 0 2px 2px;
+      }
+      .br {
+        bottom: -1px;
+        right: -1px;
+        border-width: 0 2px 2px 0;
+      }
+      .sf-lbl {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 9px;
+        color: rgba(242, 169, 0, 0.65);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      /* Badge resultado en video */
+      #vbadge {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 18px;
+        padding: 5px 18px;
+        font-family: "Oswald", sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        backdrop-filter: blur(10px);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      #vbadge.show {
+        opacity: 1;
+      }
+      #vbadge.ok {
+        background: rgba(0, 80, 30, 0.9);
+        border: 1.5px solid var(--verde);
+        color: #50ffaa;
+      }
+      #vbadge.bad {
+        background: rgba(110, 0, 15, 0.9);
+        border: 1.5px solid var(--rojo);
+        color: #ff6060;
+        animation: shk 0.3s;
+      }
+      @keyframes shk {
+        0%,
+        100% {
+          transform: translateX(-50%);
+        }
+        33% {
+          transform: translateX(calc(-50% - 7px));
+        }
+        66% {
+          transform: translateX(calc(-50% + 7px));
+        }
+      }
+
+      /* Chips */
+      .chips {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        display: flex;
+        gap: 6px;
+        pointer-events: none;
+      }
+      .chip {
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-family: "Oswald", sans-serif;
+        font-size: 12px;
+        color: #999;
+        letter-spacing: 0.5px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .chip.on {
+        border-color: var(--amarillo);
+        color: var(--amarillo);
+      }
+
+      /* Botón */
+      #btnC {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        padding: 13px;
+        cursor: pointer;
+        font-family: "Oswald", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transition: all 0.15s;
+        margin-bottom: 10px;
+      }
+      #btnC.start {
+        background: linear-gradient(135deg, var(--rojo), #880015);
+        color: #fff;
+        box-shadow: 0 3px 14px rgba(200, 16, 46, 0.35);
+      }
+      #btnC.stop {
+        background: var(--card);
+        border: 2px solid var(--border);
+        color: var(--dim);
+      }
+      #btnC:active {
+        transform: scale(0.97);
+      }
+      #btnC:disabled {
+        opacity: 0.5;
+      }
+
+      /* Status */
+      #st {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 9px 12px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: var(--dim);
+        min-height: 40px;
+        transition: border-color 0.2s;
+      }
+      #st.sc {
+        border-color: rgba(242, 169, 0, 0.25);
+        color: #d4b030;
+      }
+      #st.ok {
+        border-color: rgba(0, 166, 81, 0.35);
+        color: #50ffaa;
+      }
+      #st.bad {
+        border-color: rgba(200, 16, 46, 0.35);
+        color: #ff6060;
+      }
+
+      /* Cards */
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .dcard {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 9px 11px;
+        transition: border-color 0.2s;
+      }
+      .dcard.on {
+        border-color: rgba(242, 169, 0, 0.5);
+      }
+      .dc-l {
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--dim);
+        margin-bottom: 3px;
+      }
+      .dc-v {
+        font-family: "Oswald", sans-serif;
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--txt);
+        letter-spacing: 2px;
+        min-height: 26px;
+        transition: color 0.2s;
+      }
+      .dc-v.on {
+        color: var(--amarillo);
+      }
+
+      /* Resultado */
+      .res {
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        display: none;
+        animation: pop 0.22s ease;
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: scale(0.94);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .res.ok {
+        background: rgba(0, 100, 40, 0.17);
+        border: 2px solid var(--verde);
+        display: block;
+      }
+      .res.bad {
+        background: rgba(180, 0, 20, 0.17);
+        border: 2px solid var(--rojo);
+        display: block;
+      }
+      .ri {
+        font-size: 40px;
+        line-height: 1;
+        margin-bottom: 5px;
+      }
+      .rt {
+        font-family: "Oswald", sans-serif;
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .res.ok .rt {
+        color: #50ffaa;
+      }
+      .res.bad .rt {
+        color: #ff6060;
+      }
+      .rd {
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--dim);
+      }
+      .rn {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 6px;
+        padding: 6px 11px;
+        margin-top: 8px;
+        font-family: "Oswald", sans-serif;
+        font-size: 16px;
+        letter-spacing: 3px;
+      }
+
+      /* Botón reescanear */
+      #btnRS {
+        width: 100%;
+        margin-top: 10px;
+        border: 2px solid var(--amarillo);
+        background: transparent;
+        border-radius: 9px;
+        padding: 11px;
+        font-family: "Oswald", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--amarillo);
+        cursor: pointer;
+        display: none;
+        transition: background 0.15s;
+      }
+      #btnRS.show {
+        display: block;
+      }
+      #btnRS:active {
+        background: rgba(242, 169, 0, 0.1);
+      }
+
+      /* ====== MANUAL ====== */
+      .lbl {
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--dim);
+        margin-bottom: 9px;
+      }
+      .dg {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        margin-bottom: 15px;
+      }
+      .db {
+        background: var(--card);
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 13px 6px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .db:active {
+        transform: scale(0.95);
+      }
+      .db.on {
+        background: rgba(242, 169, 0, 0.1);
+        border-color: var(--amarillo);
+      }
+      .db .m {
+        font-family: "Oswald", sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--txt);
+        line-height: 1;
+      }
+      .db.on .m {
+        color: var(--amarillo);
+      }
+      .db .b {
+        font-size: 10px;
+        color: var(--dim);
+        letter-spacing: 1px;
+      }
+      .iw {
+        position: relative;
+        margin-bottom: 12px;
+      }
+      .sinp {
+        width: 100%;
+        background: var(--card);
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 42px 12px 13px;
+        font-family: "Oswald", sans-serif;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 4px;
+        color: var(--txt);
+        outline: none;
+        transition: border-color 0.15s;
+        -webkit-appearance: none;
+      }
+      .sinp:focus {
+        border-color: var(--amarillo);
+      }
+      .sinp::placeholder {
+        color: var(--border);
+        letter-spacing: 2px;
+      }
+      .xb {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--border);
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        color: var(--dim);
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .xb:active {
+        background: var(--rojo);
+        color: #fff;
+      }
+      .vb {
+        width: 100%;
+        background: linear-gradient(135deg, var(--rojo), #880015);
+        border: none;
+        border-radius: 10px;
+        padding: 13px;
+        font-family: "Oswald", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 3px 13px rgba(200, 16, 46, 0.33);
+        margin-bottom: 12px;
+        transition: all 0.15s;
+      }
+      .vb:active {
+        transform: scale(0.98);
+      }
+
+      /* ====== REFERENCIA ====== */
+      .rbadge {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 10px 12px;
+        margin-bottom: 13px;
+        font-size: 12px;
+        color: var(--dim);
+        line-height: 1.6;
+      }
+      .rbadge strong {
+        color: var(--amarillo);
+      }
+      .rg {
+        margin-bottom: 14px;
+      }
+      .rth {
+        font-family: "Oswald", sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 7px;
+        margin-bottom: 6px;
+      }
+      .rth.r50 {
+        background: rgba(200, 16, 46, 0.15);
+        color: #ff7070;
+      }
+      .rth.r20 {
+        background: rgba(0, 166, 81, 0.15);
+        color: #50ffaa;
+      }
+      .rth.r10 {
+        background: rgba(242, 169, 0, 0.15);
+        color: var(--amarillo);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        background: var(--card);
+        padding: 6px 9px;
+        text-align: left;
+        font-family: "Oswald", sans-serif;
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--dim);
+      }
+      td {
+        padding: 5px 9px;
+        font-family: "Oswald", sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Loader inicial */
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        z-index: 999;
+        transition: opacity 0.4s;
+      }
+      #loader.hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .ld-ring {
+        width: 44px;
+        height: 44px;
+        border: 3px solid var(--border);
+        border-top-color: var(--amarillo);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .ld-txt {
+        font-family: "Oswald", sans-serif;
+        font-size: 14px;
+        color: var(--dim);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .sp {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border: 2px solid rgba(242, 169, 0, 0.2);
+        border-top-color: var(--amarillo);
+        border-radius: 50%;
+        animation: spin 0.55s linear infinite;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+      canvas {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loader mientras Tesseract carga -->
+    <div id="loader">
+      <div class="ld-ring"></div>
+      <div class="ld-txt">Cargando motor OCR...</div>
+    </div>
+
+    <div class="hdr">
+      <div class="hdr-r">
+        <span style="font-size: 24px">🇧🇴</span>
+        <h1>
+          Verificador Billetes<em>Serie B · CP9/2026 · Sin valor legal</em>
+        </h1>
+      </div>
+      <div class="alerta">
+        <span class="dot"></span><strong>28 feb 2026</strong> — Billetes Serie B
+        sin valor legal circulando.
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" onclick="goTab('cam')">
+        <span class="ti">📷</span>Cámara
+      </div>
+      <div class="tab" onclick="goTab('man')">
+        <span class="ti">⌨️</span>Manual
+      </div>
+      <div class="tab" onclick="goTab('ref')">
+        <span class="ti">📋</span>Series
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- CÁMARA -->
+      <div id="p-cam" class="panel on">
+        <div class="cam-box">
+          <video id="vid" autoplay playsinline muted></video>
+          <div class="ov ov-t"></div>
+          <div class="ov ov-b"></div>
+          <div class="ov ov-l"></div>
+          <div class="ov ov-r"></div>
+          <div id="sf">
+            <div class="sfl"></div>
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+            <div class="sf-lbl">Número de serie aquí</div>
+          </div>
+          <div id="vbadge"></div>
+          <div class="chips">
+            <div class="chip" id="chD">Bs. —</div>
+            <div class="chip" id="chS">— — — —</div>
+          </div>
+        </div>
+
+        <button id="btnC" class="start" onclick="toggleCam()">
+          📷 Activar Cámara
+        </button>
+
+        <div id="st">
+          <span style="font-size: 18px">💡</span
+          ><span id="stT">Motor listo. Activa la cámara.</span>
+        </div>
+
+        <div class="cards">
+          <div class="dcard" id="cD">
+            <div class="dc-l">Denominación</div>
+            <div class="dc-v" id="cDv">—</div>
+          </div>
+          <div class="dcard" id="cS">
+            <div class="dc-l">Nº de Serie</div>
+            <div class="dc-v" id="cSv">—</div>
+          </div>
+        </div>
+
+        <div class="res" id="rC"></div>
+        <button id="btnRS" onclick="rescan()">🔄 Escanear otro billete</button>
+      </div>
+
+      <!-- MANUAL -->
+      <div id="p-man" class="panel">
+        <div class="lbl">1. Denominación</div>
+        <div class="dg">
+          <div class="db" onclick="sd(50, this)">
+            <div class="m">50</div>
+            <div class="b">Bs.</div>
+          </div>
+          <div class="db" onclick="sd(20, this)">
+            <div class="m">20</div>
+            <div class="b">Bs.</div>
+          </div>
+          <div class="db" onclick="sd(10, this)">
+            <div class="m">10</div>
+            <div class="b">Bs.</div>
+          </div>
+        </div>
+        <div class="lbl">2. Número de serie</div>
+        <div class="iw">
+          <input
+            type="number"
+            class="sinp"
+            id="sinp"
+            placeholder="00000000"
+            oninput="this.value = this.value.slice(0, 9)"
+            onkeydown="if (event.key === 'Enter') vm();"
+          />
+          <button class="xb" onclick="cm()">✕</button>
+        </div>
+        <button class="vb" onclick="vm()">✓ Verificar</button>
+        <div class="res" id="rM"></div>
+      </div>
+
+      <!-- REFERENCIA -->
+      <div id="p-ref" class="panel">
+        <div class="rbadge">
+          <strong>CP9/2026</strong> · BCB · Serie B que
+          <strong>NO tiene valor legal</strong>. Si el número cae en estos
+          rangos, el billete es inválido.
+        </div>
+        <div class="rg">
+          <div class="rth r50">💴 Bs. 50</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Desde</th>
+                <th>Hasta</th>
+              </tr>
+            </thead>
+            <tbody id="tb50"></tbody>
+          </table>
+        </div>
+        <div class="rg">
+          <div class="rth r20">💵 Bs. 20</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Desde</th>
+                <th>Hasta</th>
+              </tr>
+            </thead>
+            <tbody id="tb20"></tbody>
+          </table>
+        </div>
+        <div class="rg">
+          <div class="rth r10">💶 Bs. 10</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Desde</th>
+                <th>Hasta</th>
+              </tr>
+            </thead>
+            <tbody id="tb10"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="cv"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script>
+      // ================================================================
+      // RANGOS INVÁLIDOS CP9/2026
+      // ================================================================
+      const R = {
+        50: [
+          [67250001, 67700000],
+          [69050001, 69500000],
+          [69500001, 69950000],
+          [69950001, 70400000],
+          [70400001, 70850000],
+          [70850001, 71300000],
+          [76310012, 85139995],
+          [86400001, 86850000],
+          [90900001, 91350000],
+          [91800001, 92250000],
+        ],
+        20: [
+          [87280145, 91646549],
+          [96650001, 97100000],
+          [99800001, 100250000],
+          [100250001, 100700000],
+          [109250001, 109700000],
+          [110600001, 111050000],
+          [111050001, 111500000],
+          [111950001, 112400000],
+          [112400001, 112850000],
+          [112850001, 113300000],
+          [114200001, 114650000],
+          [114650001, 115100000],
+          [115100001, 115550000],
+          [118700001, 119150000],
+          [119150001, 119600000],
+          [120500001, 120950000],
+        ],
+        10: [
+          [77100001, 77550000],
+          [78000001, 78450000],
+          [78900001, 96350000],
+          [96350001, 96800000],
+          [96800001, 97250000],
+          [98150001, 98600000],
+          [104900001, 105350000],
+          [105350001, 105800000],
+          [106700001, 107150000],
+          [107600001, 108050000],
+          [108050001, 108500000],
+          [109400001, 109850000],
+        ],
+      };
+      const inv = (d, n) => (R[d] || []).some(([a, b]) => n >= a && n <= b);
+
+      // ================================================================
+      // ESTADO
+      // ================================================================
+      let stream = null,
+        worker = null,
+        busy = false,
+        paused = false,
+        dMan = null;
+      let hits = {}; // {key: count} para confirmar detección
+
+      // ================================================================
+      // INIT — cargar Tesseract al arrancar, UNA SOLA VEZ
+      // ================================================================
+      async function initOCR() {
+        try {
+          worker = await Tesseract.createWorker("eng", 1, { logger: () => {} });
+          // PSM 7 = línea de texto única → ideal para número de serie
+          await worker.setParameters({
+            tessedit_char_whitelist: "0123456789",
+            tessedit_pageseg_mode: "7",
+          });
+          document.getElementById("loader").classList.add("hide");
+          setSt("", "Motor listo. Activa la cámara.");
+          setTimeout(() => document.getElementById("loader").remove(), 500);
+        } catch (e) {
+          // Si Tesseract falla, seguir igual (se puede usar modo manual)
+          document.getElementById("loader").classList.add("hide");
+          console.warn("Tesseract no cargó:", e);
+          setSt("", "Activa la cámara (OCR básico disponible).");
+        }
+      }
+
+      // ================================================================
+      // CÁMARA
+      // ================================================================
+      async function toggleCam() {
+        stream ? stopCam() : startCam();
+      }
+
+      async function startCam() {
+        const btn = document.getElementById("btnC");
+        btn.disabled = true;
+        btn.textContent = "⏳ Iniciando...";
+        setSt("sc", '<span class="sp"></span> Conectando cámara...');
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: "environment" },
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            },
+            audio: false,
+          });
+          const v = document.getElementById("vid");
+          v.srcObject = stream;
+          await new Promise((r) => {
+            v.onloadedmetadata = () => {
+              v.play();
+              r();
+            };
+          });
+          document.getElementById("sf").style.display = "block";
+          btn.textContent = "⏹ Detener";
+          btn.className = "stop";
+          btn.disabled = false;
+          paused = false;
+          hits = {};
+          setSt(
+            "sc",
+            '<span class="sp"></span> Escaneando... Apunta el número de serie al área marcada.',
+          );
+          scheduleNext();
+        } catch (e) {
+          btn.textContent = "📷 Activar Cámara";
+          btn.className = "start";
+          btn.disabled = false;
+          setSt("bad", "⚠️ Sin acceso a cámara: " + e.message);
+        }
+      }
+
+      function stopCam() {
+        paused = true;
+        busy = false;
+        if (stream) {
+          stream.getTracks().forEach((t) => t.stop());
+          stream = null;
+        }
+        document.getElementById("vid").srcObject = null;
+        document.getElementById("sf").style.display = "none";
+        document.getElementById("btnC").textContent = "📷 Activar Cámara";
+        document.getElementById("btnC").className = "start";
+        resetCamUI();
+        setSt("", "Activa la cámara y apunta el billete al área marcada.");
+      }
+
+      // Programar siguiente escaneo — 800ms entre scans para no saturar el móvil
+      function scheduleNext() {
+        if (!stream || paused) return;
+        setTimeout(doScan, 800);
+      }
+
+      // ================================================================
+      // ESCANEO
+      // ================================================================
+      async function doScan() {
+        if (!stream || paused || busy) return;
+        busy = true;
+
+        const vid = document.getElementById("vid");
+        const vw = vid.videoWidth,
+          vh = vid.videoHeight;
+        if (!vw || !vh) {
+          busy = false;
+          scheduleNext();
+          return;
+        }
+
+        const cv = document.getElementById("cv");
+        const ctx = cv.getContext("2d", { willReadFrequently: true });
+
+        // ── 1. CAPTURAR ZONA CENTRAL (donde está el número de serie) ──
+        // Zona: 6-94% horizontal, 28-72% vertical del frame
+        const sx = Math.floor(vw * 0.06),
+          sy = Math.floor(vh * 0.28);
+        const sw = Math.floor(vw * 0.88),
+          sh = Math.floor(vh * 0.44);
+
+        // Escalar la franja a 800px de ancho para uniformidad
+        const targetW = 800,
+          targetH = Math.round(sh * (targetW / sw));
+        cv.width = targetW;
+        cv.height = targetH;
+        ctx.drawImage(vid, sx, sy, sw, sh, 0, 0, targetW, targetH);
+
+        // Preprocesar: escala de grises + aumento de contraste + binarización
+        const imgd = ctx.getImageData(0, 0, targetW, targetH);
+        preprocess(imgd);
+        ctx.putImageData(imgd, 0, 0);
+
+        // ── 2. INTENTAR PRIMERO CON BarcodeDetector (nativo, instantáneo) ──
+        let serie = null,
+          denom = null;
+
+        if ("BarcodeDetector" in window) {
+          try {
+            const bd = new BarcodeDetector({
+              formats: ["code_128", "code_39", "code_93", "itf", "codabar"],
+            });
+            const barcodes = await bd.detect(vid); // imagen completa para barcode
+            for (const bc of barcodes) {
+              const raw = bc.rawValue.replace(/\D/g, "");
+              if (raw.length >= 7) {
+                serie = parseInt(raw.slice(0, 9));
+                break;
+              }
+            }
+          } catch (_) {}
+        }
+
+        // ── 3. SI NO HAY BARCODE, USAR OCR EN LA ZONA CENTRAL ──
+        if (!serie && worker) {
+          try {
+            const {
+              data: { text },
+            } = await worker.recognize(cv);
+            serie = parseSerie(text);
+          } catch (e) {
+            console.warn("OCR err:", e);
+          }
+        }
+
+        // ── 4. DETECTAR DENOMINACIÓN ──
+        // Capturar zona inferior-izquierda (donde está "50", "20", "10" grande)
+        const denomW = Math.floor(vw * 0.3),
+          denomH = Math.floor(vw * 0.22);
+        cv.width = denomW;
+        cv.height = denomH;
+        ctx.drawImage(
+          vid,
+          0,
+          Math.floor(vh * 0.7),
+          denomW,
+          denomH,
+          0,
+          0,
+          denomW,
+          denomH,
+        );
+        if (worker) {
+          try {
+            await worker.setParameters({
+              tessedit_char_whitelist: "0123456789",
+              tessedit_pageseg_mode: "7",
+            });
+            const {
+              data: { text: td },
+            } = await worker.recognize(cv);
+            denom = parseDenom(td);
+          } catch (_) {}
+        }
+
+        // Si la denominación no se detectó por OCR, intentar inferirla desde el número de serie
+        if (!denom && serie) denom = inferDenomFromSerie(serie);
+
+        busy = false;
+        handleResult(denom, serie);
+        scheduleNext();
+      }
+
+      // ================================================================
+      // PREPROCESAMIENTO
+      // ================================================================
+      function preprocess(imgd) {
+        const d = imgd.data,
+          n = d.length;
+        // Paso 1: gris
+        const g = new Uint8Array(n / 4);
+        for (let i = 0; i < n / 4; i++)
+          g[i] = Math.round(
+            0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2],
+          );
+        // Paso 2: umbral Otsu
+        const hist = new Int32Array(256);
+        for (let i = 0; i < g.length; i++) hist[g[i]]++;
+        let sum = 0;
+        for (let i = 0; i < 256; i++) sum += i * hist[i];
+        let wB = 0,
+          sumB = 0,
+          max = 0,
+          thr = 128;
+        for (let t = 0; t < 256; t++) {
+          wB += hist[t];
+          if (!wB) continue;
+          const wF = g.length - wB;
+          if (!wF) break;
+          sumB += t * hist[t];
+          const mB = sumB / wB,
+            mF = (sum - sumB) / wF;
+          const between = wB * wF * (mB - mF) * (mB - mF);
+          if (between > max) {
+            max = between;
+            thr = t;
+          }
+        }
+        // Paso 3: binarizar con threshold Otsu + inversión si fondo oscuro
+        for (let i = 0; i < g.length; i++) {
+          const v = g[i] > thr ? 255 : 0;
+          d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = v;
+          d[i * 4 + 3] = 255;
+        }
+      }
+
+      // ================================================================
+      // PARSERS
+      // ================================================================
+      function parseSerie(txt) {
+        // Extraer todos los grupos de dígitos
+        const groups = txt.replace(/\s/g, "").match(/\d{6,9}/g) || [];
+        // Filtrar los que tienen sentido como número de serie (> 1,000,000)
+        const valids = groups
+          .map(Number)
+          .filter((n) => n > 1000000 && n < 200000000);
+        if (!valids.length) return null;
+        // Priorizar el que tenga longitud 8 o 9
+        return valids[0];
+      }
+
+      function parseDenom(txt) {
+        const t = txt.replace(/\s/g, "");
+        if (/50/.test(t)) return 50;
+        if (/20/.test(t)) return 20;
+        if (/10/.test(t)) return 10;
+        return null;
+      }
+
+      // Inferir denominación según qué rangos contienen el número detectado
+      function inferDenomFromSerie(n) {
+        for (const d of [50, 20, 10]) {
+          if ((R[d] || []).some(([a, b]) => n >= a && n <= b)) return d;
+          // También verificar si está cercano a algún rango (dentro de 5M)
+          if ((R[d] || []).some(([a, b]) => n > a - 5000000 && n < b + 5000000))
+            return d;
+        }
+        return null;
+      }
+
+      // ================================================================
+      // LÓGICA DE CONFIRMACIÓN
+      // ================================================================
+      const NEEDED = 2; // 2 lecturas iguales para confirmar (rápido pero confiable)
+
+      function handleResult(denom, serie) {
+        if (paused) return;
+
+        // Actualizar chips visualmente
+        if (denom) {
+          setChip("chD", "Bs. " + denom, true);
+          setCard("cD", "cDv", "Bs. " + denom, true);
+        }
+        if (serie) {
+          setChip("chS", "" + serie, true);
+          setCard("cS", "cSv", "" + serie, true);
+        }
+
+        if (!denom && !serie) {
+          setSt(
+            "sc",
+            '<span class="sp"></span> Escaneando... Apunta el número de serie al área.',
+          );
+          return;
+        }
+        if (!serie) {
+          setSt(
+            "sc",
+            '<span class="sp"></span> Bs.' +
+              denom +
+              " detectado — buscando número de serie...",
+          );
+          return;
+        }
+        if (!denom) {
+          setSt(
+            "sc",
+            '<span class="sp"></span> ' + serie + " — buscando denominación...",
+          );
+          return;
+        }
+
+        // Contar confirmaciones
+        const k = denom + ":" + serie;
+        hits[k] = (hits[k] || 0) + 1;
+
+        if (hits[k] < NEEDED) {
+          setSt(
+            "sc",
+            '<span class="sp"></span> Confirmando (' +
+              hits[k] +
+              "/" +
+              NEEDED +
+              ")... Bs." +
+              denom +
+              " · " +
+              serie,
+          );
+          return;
+        }
+
+        // ¡CONFIRMADO! Pausar y mostrar resultado
+        paused = true;
+        const bad = inv(denom, serie);
+
+        const vb = document.getElementById("vbadge");
+        vb.textContent = bad ? "⛔ INVÁLIDO" : "✅ VÁLIDO";
+        vb.className = "show " + (bad ? "bad" : "ok");
+
+        showRes("rC", denom, serie);
+        setSt(
+          bad ? "bad" : "ok",
+          bad
+            ? '⛔ <strong style="color:#ff6060">INVÁLIDO</strong> — Bs.' +
+                denom +
+                " · Nº " +
+                serie
+            : '✅ <strong style="color:#50ffaa">VÁLIDO</strong> — Bs.' +
+                denom +
+                " · Nº " +
+                serie,
+        );
+        document.getElementById("btnRS").className = "show";
+      }
+
+      function rescan() {
+        paused = false;
+        hits = {};
+        document.getElementById("vbadge").className = "";
+        document.getElementById("rC").className = "res";
+        document.getElementById("rC").innerHTML = "";
+        document.getElementById("btnRS").className = "";
+        resetCamUI();
+        setSt("sc", '<span class="sp"></span> Escaneando siguiente billete...');
+        scheduleNext();
+      }
+
+      function resetCamUI() {
+        hits = {};
+        setChip("chD", "Bs. —", false);
+        setChip("chS", "— — — —", false);
+        setCard("cD", "cDv", "—", false);
+        setCard("cS", "cSv", "—", false);
+        document.getElementById("vbadge").className = "";
+      }
+
+      function setChip(id, t, on) {
+        const e = document.getElementById(id);
+        e.textContent = t;
+        e.className = "chip" + (on ? " on" : "");
+      }
+      function setCard(cid, vid, t, on) {
+        document.getElementById(cid).className = "dcard" + (on ? " on" : "");
+        const v = document.getElementById(vid);
+        v.textContent = t;
+        v.className = "dc-v" + (on ? " on" : "");
+      }
+      function setSt(cls, html) {
+        const e = document.getElementById("st");
+        e.className = cls ? cls : "";
+        e.innerHTML = "<span></span><span>" + html + "</span>";
+      }
+
+      // ================================================================
+      // RESULTADO
+      // ================================================================
+      function showRes(id, denom, serie) {
+        const el = document.getElementById(id),
+          bad = inv(denom, serie);
+        el.className = "res " + (bad ? "bad" : "ok");
+        el.innerHTML = bad
+          ? `<div class="ri">⛔</div><div class="rt">BILLETE INVÁLIDO</div>
+      <div class="rd">Este billete <strong>NO tiene valor legal</strong>.<br>Anulado por el BCB según CP9/2026.</div>
+      <div class="rn">Bs.${denom} · Nº ${serie}</div>`
+          : `<div class="ri">✅</div><div class="rt">BILLETE VÁLIDO</div>
+      <div class="rd">No aparece en la lista de billetes anulados del CP9/2026.</div>
+      <div class="rn">Bs.${denom} · Nº ${serie}</div>`;
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // ================================================================
+      // MANUAL
+      // ================================================================
+      function sd(v, el) {
+        dMan = v;
+        document
+          .querySelectorAll(".db")
+          .forEach((b) => b.classList.remove("on"));
+        el.classList.add("on");
+      }
+      function cm() {
+        document.getElementById("sinp").value = "";
+        document.getElementById("sinp").focus();
+        const r = document.getElementById("rM");
+        r.className = "res";
+        r.innerHTML = "";
+      }
+      function vm() {
+        const val = document.getElementById("sinp").value.trim();
+        if (!dMan) {
+          alert("⚠️ Selecciona la denominación");
+          return;
+        }
+        if (!val) {
+          alert("⚠️ Ingresa el número de serie");
+          return;
+        }
+        showRes("rM", dMan, parseInt(val));
+      }
+
+      // ================================================================
+      // TABS
+      // ================================================================
+      function goTab(n) {
+        document
+          .querySelectorAll(".panel")
+          .forEach((p) => p.classList.remove("on"));
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("on"));
+        document.getElementById("p-" + n).classList.add("on");
+        ["cam", "man", "ref"].forEach((x, i) => {
+          if (x === n) document.querySelectorAll(".tab")[i].classList.add("on");
+        });
+        if (n !== "cam" && stream) stopCam();
+      }
+
+      // ================================================================
+      // TABLA REFERENCIA
+      // ================================================================
+      [50, 20, 10].forEach((d) => {
+        const tb = document.getElementById("tb" + d);
+        R[d].forEach(([a, b]) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${a.toLocaleString()}</td><td>${b.toLocaleString()}</td>`;
+          tb.appendChild(tr);
+        });
+      });
+
+      // ================================================================
+      // ARRANCAR — precargar OCR inmediatamente
+      // ================================================================
+      initOCR();
+    </script>
+  </body>
 </html>
