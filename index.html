@@ -33,7 +33,6 @@
         min-height: 100vh;
       }
 
-      /* HEADER */
       .hdr {
         background: linear-gradient(150deg, #b8001c, #720012);
         padding: 14px 16px 12px;
@@ -101,7 +100,6 @@
         }
       }
 
-      /* TABS */
       .tabs {
         display: flex;
         background: #111;
@@ -132,7 +130,7 @@
       }
 
       .content {
-        padding: 14px 13px 28px;
+        padding: 14px 13px 32px;
       }
       .panel {
         display: none;
@@ -141,73 +139,64 @@
         display: block;
       }
 
-      /* ====== PANEL FOTO ====== */
-
-      /* Zona de foto */
+      /* FOTO ZONE */
       .foto-zone {
         position: relative;
         border-radius: 14px;
         overflow: hidden;
         background: var(--card);
         border: 2px dashed var(--border);
-        min-height: 200px;
+        min-height: 190px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: border-color 0.2s;
-        margin-bottom: 12px;
+        margin-bottom: 11px;
       }
-      .foto-zone:active {
-        border-color: var(--amarillo);
-      }
-      .foto-zone.has-img {
+      .foto-zone.has {
         border-style: solid;
-        border-color: var(--amarillo);
+        border-color: rgba(242, 169, 0, 0.5);
       }
-
-      #preview {
+      #prev {
         width: 100%;
-        max-height: 300px;
+        max-height: 280px;
         object-fit: contain;
         display: none;
       }
-
-      .fz-placeholder {
+      .fzp {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 10px;
-        padding: 32px 20px;
+        padding: 30px 20px;
         pointer-events: none;
       }
-      .fz-icon {
-        font-size: 50px;
-        opacity: 0.35;
+      .fzp-ico {
+        font-size: 48px;
+        opacity: 0.3;
       }
-      .fz-txt {
+      .fzp-txt {
         font-size: 13px;
         color: var(--dim);
         text-align: center;
         line-height: 1.5;
       }
-      .fz-txt strong {
+      .fzp-txt strong {
         color: var(--amarillo);
       }
-
-      /* Input file oculto */
       #fileIn {
         display: none;
       }
 
-      /* Botones de acción */
+      /* BOTONES */
       .btn-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 8px;
-        margin-bottom: 12px;
+        margin-bottom: 11px;
       }
-      .btn-foto {
+      .btn-a {
         border: none;
         border-radius: 11px;
         padding: 13px 8px;
@@ -221,23 +210,23 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 5px;
       }
-      .btn-foto:active {
+      .btn-a:active {
         transform: scale(0.96);
       }
-      .btn-cam-take {
+      .b-cam {
         background: linear-gradient(135deg, var(--rojo), #880015);
         color: #fff;
         box-shadow: 0 3px 14px rgba(200, 16, 46, 0.33);
       }
-      .btn-gal {
+      .b-gal {
         background: var(--card);
         border: 2px solid var(--border);
         color: var(--dim);
       }
 
-      .btn-verificar {
+      .btn-ver {
         width: 100%;
         border: none;
         border-radius: 12px;
@@ -252,57 +241,92 @@
         background: linear-gradient(135deg, var(--rojo), #880015);
         box-shadow: 0 3px 16px rgba(200, 16, 46, 0.35);
         transition: all 0.15s;
-        margin-bottom: 14px;
+        margin-bottom: 13px;
         display: none;
       }
-      .btn-verificar.show {
+      .btn-ver.show {
         display: block;
       }
-      .btn-verificar:active {
+      .btn-ver:disabled {
+        opacity: 0.5;
+      }
+      .btn-ver:active {
         transform: scale(0.98);
       }
-      .btn-verificar:disabled {
-        opacity: 0.5;
-        transform: none;
-      }
 
-      /* Estado del análisis */
-      .anl-state {
+      /* PROGRESO OCR */
+      .ocr-prog {
         display: none;
-        align-items: center;
-        gap: 10px;
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 12px 14px;
+        padding: 13px 14px;
         margin-bottom: 12px;
-        font-size: 13px;
+      }
+      .ocr-prog.show {
+        display: block;
+      }
+      .prog-label {
+        font-size: 12px;
         color: var(--dim);
-      }
-      .anl-state.show {
+        margin-bottom: 8px;
         display: flex;
+        align-items: center;
+        gap: 7px;
       }
-      .anl-state.scanning {
-        border-color: rgba(242, 169, 0, 0.3);
-        color: #d4b030;
+      .prog-bar-bg {
+        background: var(--border);
+        border-radius: 99px;
+        height: 5px;
+        overflow: hidden;
       }
-      .anl-state.ok {
-        border-color: rgba(0, 166, 81, 0.35);
-        color: #50ffaa;
+      .prog-bar {
+        height: 100%;
+        background: var(--amarillo);
+        border-radius: 99px;
+        transition: width 0.3s;
+        width: 0%;
       }
-      .anl-state.bad {
-        border-color: rgba(200, 16, 46, 0.35);
-        color: #ff6060;
-      }
-      .anl-state.warn {
-        border-color: rgba(242, 169, 0, 0.35);
-        color: #d4b030;
+      .prog-txt {
+        font-size: 11px;
+        color: var(--dim);
+        margin-top: 6px;
+        min-height: 16px;
       }
 
-      /* Resultado principal */
+      /* DEBUG: mostrar texto OCR detectado */
+      .ocr-debug {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 11px;
+        display: none;
+      }
+      .ocr-debug.show {
+        display: block;
+      }
+      .ocr-debug-lbl {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--dim);
+        margin-bottom: 5px;
+      }
+      .ocr-raw {
+        font-family: monospace;
+        font-size: 12px;
+        color: #9a9;
+        word-break: break-all;
+        line-height: 1.5;
+        max-height: 80px;
+        overflow-y: auto;
+      }
+
+      /* RESULTADO */
       .result {
         border-radius: 14px;
-        padding: 18px;
+        padding: 17px;
         text-align: center;
         display: none;
         animation: pop 0.25s ease;
@@ -318,30 +342,30 @@
         }
       }
       .result.ok {
-        background: rgba(0, 110, 45, 0.16);
+        background: rgba(0, 110, 45, 0.15);
         border: 2px solid var(--verde);
         display: block;
       }
       .result.bad {
-        background: rgba(180, 0, 20, 0.16);
+        background: rgba(180, 0, 20, 0.15);
         border: 2px solid var(--rojo);
         display: block;
       }
       .result.warn {
-        background: rgba(242, 169, 0, 0.1);
-        border: 2px solid rgba(242, 169, 0, 0.5);
+        background: rgba(242, 169, 0, 0.09);
+        border: 2px solid rgba(242, 169, 0, 0.4);
         display: block;
       }
       .r-ico {
-        font-size: 48px;
+        font-size: 46px;
         line-height: 1;
-        margin-bottom: 8px;
+        margin-bottom: 7px;
       }
       .r-ttl {
         font-family: "Oswald", sans-serif;
-        font-size: 22px;
+        font-size: 21px;
         font-weight: 700;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
       }
       .result.ok .r-ttl {
         color: #50ffaa;
@@ -358,12 +382,10 @@
         color: var(--dim);
         margin-bottom: 10px;
       }
-
-      /* Ficha de datos detectados */
       .r-ficha {
         background: rgba(0, 0, 0, 0.3);
         border-radius: 9px;
-        padding: 12px 14px;
+        padding: 11px 13px;
         text-align: left;
       }
       .r-row {
@@ -377,28 +399,122 @@
         border-bottom: none;
       }
       .r-key {
-        font-size: 11px;
+        font-size: 10px;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         color: var(--dim);
       }
       .r-val {
         font-family: "Oswald", sans-serif;
-        font-size: 16px;
+        font-size: 15px;
         letter-spacing: 2px;
         color: var(--txt);
       }
 
-      /* Botón nueva foto */
+      /* Corrección manual si OCR falla */
+      .corr-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        padding: 13px;
+        margin-top: 11px;
+        display: none;
+      }
+      .corr-box.show {
+        display: block;
+      }
+      .corr-lbl {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--dim);
+        margin-bottom: 8px;
+      }
+      .corr-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .corr-denom-btn {
+        background: var(--bg);
+        border: 2px solid var(--border);
+        border-radius: 9px;
+        padding: 10px 6px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .corr-denom-btn.on {
+        border-color: var(--amarillo);
+        background: rgba(242, 169, 0, 0.1);
+      }
+      .corr-denom-btn:active {
+        transform: scale(0.95);
+      }
+      .corr-denom-btn .cm {
+        font-family: "Oswald", sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--txt);
+        line-height: 1;
+      }
+      .corr-denom-btn.on .cm {
+        color: var(--amarillo);
+      }
+      .corr-denom-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        margin-bottom: 10px;
+      }
+      .corr-inp {
+        width: 100%;
+        background: var(--bg);
+        border: 2px solid var(--border);
+        border-radius: 9px;
+        padding: 11px 13px;
+        font-family: "Oswald", sans-serif;
+        font-size: 20px;
+        letter-spacing: 4px;
+        color: var(--amarillo);
+        outline: none;
+        text-align: center;
+        margin-bottom: 10px;
+        -webkit-appearance: none;
+      }
+      .corr-inp:focus {
+        border-color: var(--amarillo);
+      }
+      .btn-corr-ver {
+        width: 100%;
+        border: none;
+        border-radius: 9px;
+        padding: 12px;
+        font-family: "Oswald", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(135deg, #555, #333);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-corr-ver:active {
+        transform: scale(0.98);
+      }
+
       .btn-nueva {
         width: 100%;
         margin-top: 10px;
         border: 2px solid var(--amarillo);
         background: transparent;
         border-radius: 10px;
-        padding: 12px;
+        padding: 11px;
         font-family: "Oswald", sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
         letter-spacing: 2px;
         text-transform: uppercase;
@@ -414,22 +530,7 @@
         background: rgba(242, 169, 0, 0.1);
       }
 
-      /* Tip */
-      .tip {
-        background: rgba(242, 169, 0, 0.07);
-        border: 1px solid rgba(242, 169, 0, 0.15);
-        border-radius: 9px;
-        padding: 10px 12px;
-        font-size: 12px;
-        color: #c8a828;
-        line-height: 1.6;
-        margin-bottom: 12px;
-      }
-      .tip strong {
-        color: var(--amarillo);
-      }
-
-      /* ====== MANUAL ====== */
+      /* MANUAL */
       .lbl {
         font-family: "Oswald", sans-serif;
         font-size: 10px;
@@ -544,7 +645,7 @@
         transform: scale(0.98);
       }
 
-      /* ====== REFERENCIA ====== */
+      /* REFERENCIA */
       .rbadge {
         background: var(--card);
         border: 1px solid var(--border);
@@ -599,18 +700,16 @@
         padding: 5px 9px;
         font-family: "Oswald", sans-serif;
         font-size: 12px;
-        letter-spacing: 0.5px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.03);
       }
       tr:last-child td {
         border-bottom: none;
       }
 
-      /* Spinner */
       .sp {
         display: inline-block;
-        width: 16px;
-        height: 16px;
+        width: 13px;
+        height: 13px;
         border: 2px solid rgba(242, 169, 0, 0.2);
         border-top-color: var(--amarillo);
         border-radius: 50%;
@@ -621,6 +720,9 @@
         to {
           transform: rotate(360deg);
         }
+      }
+      canvas {
+        display: none;
       }
     </style>
   </head>
@@ -634,7 +736,7 @@
       </div>
       <div class="alerta">
         <span class="dot"></span><strong>28 feb 2026</strong> — Billetes Serie B
-        sin valor legal circulando. Verifica antes de aceptar.
+        sin valor legal circulando.
       </div>
     </div>
 
@@ -651,15 +753,8 @@
     </div>
 
     <div class="content">
-      <!-- ======== FOTO ======== -->
+      <!-- FOTO -->
       <div id="p-foto" class="panel on">
-        <div class="tip">
-          📸 <strong>Cómo usar:</strong> Toma una foto del billete asegurándote
-          que el número de serie y la denominación sean visibles. La app detecta
-          todo automáticamente.
-        </div>
-
-        <!-- Input oculto — capture=environment abre cámara directamente en móvil -->
         <input
           type="file"
           id="fileIn"
@@ -668,53 +763,87 @@
           onchange="onFoto(this)"
         />
 
-        <!-- Preview de la foto -->
-        <div
-          class="foto-zone"
-          id="fotoZone"
-          onclick="document.getElementById('fileIn').click()"
-        >
-          <img id="preview" alt="Foto del billete" />
-          <div class="fz-placeholder" id="fzPlaceholder">
-            <div class="fz-icon">📷</div>
-            <div class="fz-txt">
-              Toca aquí para<br /><strong>tomar la foto del billete</strong>
+        <div class="foto-zone" id="fz" onclick="abrirCam()">
+          <img id="prev" alt="" />
+          <div class="fzp" id="fzp">
+            <div class="fzp-ico">📷</div>
+            <div class="fzp-txt">
+              Toca para <strong>fotografiar el billete</strong><br /><span
+                style="font-size: 11px; opacity: 0.6"
+                >Asegúrate que el número de serie sea visible</span
+              >
             </div>
           </div>
         </div>
 
-        <!-- Botones -->
         <div class="btn-row">
-          <button
-            class="btn-foto btn-cam-take"
-            onclick="document.getElementById('fileIn').click()"
-          >
-            📷 Tomar Foto
-          </button>
-          <button class="btn-foto btn-gal" onclick="abrirGaleria()">
+          <button class="btn-a b-cam" onclick="abrirCam()">📷 Cámara</button>
+          <button class="btn-a b-gal" onclick="abrirGaleria()">
             🖼 Galería
           </button>
         </div>
 
-        <!-- Botón verificar (aparece después de foto) -->
-        <button class="btn-verificar" id="btnVer" onclick="verificarFoto()">
-          🔍 Verificar Billete
+        <button class="btn-ver" id="btnVer" onclick="procesarFoto()">
+          🔍 Leer y Verificar
         </button>
 
-        <!-- Estado del análisis -->
-        <div class="anl-state" id="anlState">
-          <div class="sp"></div>
-          <span id="anlTxt">Analizando imagen...</span>
+        <!-- Progreso OCR -->
+        <div class="ocr-prog" id="ocrProg">
+          <div class="prog-label">
+            <span class="sp"></span><span id="progLbl">Iniciando...</span>
+          </div>
+          <div class="prog-bar-bg">
+            <div class="prog-bar" id="progBar"></div>
+          </div>
+          <div class="prog-txt" id="progTxt"></div>
         </div>
 
-        <!-- Resultado -->
+        <!-- Texto OCR crudo (debug/transparencia) -->
+        <div class="ocr-debug" id="ocrDebug">
+          <div class="ocr-debug-lbl">Texto detectado por OCR</div>
+          <div class="ocr-raw" id="ocrRaw"></div>
+        </div>
+
+        <!-- Resultado automático -->
         <div class="result" id="rFoto"></div>
+
+        <!-- Corrección manual si OCR no detectó bien -->
+        <div class="corr-box" id="corrBox">
+          <div class="corr-lbl">¿No es correcto? Corrige aquí:</div>
+          <div class="corr-lbl" style="margin-top: 4px">Denominación</div>
+          <div class="corr-denom-grid">
+            <div class="corr-denom-btn" onclick="setCorrDenom(50, this)">
+              <div class="cm">50</div>
+              <div style="font-size: 10px; color: var(--dim)">Bs.</div>
+            </div>
+            <div class="corr-denom-btn" onclick="setCorrDenom(20, this)">
+              <div class="cm">20</div>
+              <div style="font-size: 10px; color: var(--dim)">Bs.</div>
+            </div>
+            <div class="corr-denom-btn" onclick="setCorrDenom(10, this)">
+              <div class="cm">10</div>
+              <div style="font-size: 10px; color: var(--dim)">Bs.</div>
+            </div>
+          </div>
+          <div class="corr-lbl">Número de serie</div>
+          <input
+            type="number"
+            class="corr-inp"
+            id="corrInp"
+            placeholder="00000000"
+            oninput="this.value = this.value.slice(0, 9)"
+          />
+          <button class="btn-corr-ver" onclick="verificarManualCorr()">
+            ✓ Verificar con estos datos
+          </button>
+        </div>
+
         <button class="btn-nueva" id="btnNueva" onclick="nuevaFoto()">
           📷 Verificar otro billete
         </button>
       </div>
 
-      <!-- ======== MANUAL ======== -->
+      <!-- MANUAL -->
       <div id="p-man" class="panel">
         <div class="lbl">1. Denominación</div>
         <div class="dg">
@@ -747,12 +876,11 @@
         <div class="result" id="rMan"></div>
       </div>
 
-      <!-- ======== REFERENCIA ======== -->
+      <!-- REFERENCIA -->
       <div id="p-ref" class="panel">
         <div class="rbadge">
-          <strong>CP9/2026</strong> · BCB · Serie B que
-          <strong>NO tiene valor legal</strong>. Si el número cae en estos
-          rangos, el billete es inválido.
+          <strong>CP9/2026</strong> · BCB · Serie B sin valor legal. Si el
+          número cae en estos rangos, el billete es inválido.
         </div>
         <div class="rg">
           <div class="rth r50">💴 Bs. 50</div>
@@ -793,6 +921,10 @@
       </div>
     </div>
 
+    <canvas id="cv"></canvas>
+
+    <!-- Tesseract v5 -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
       // ================================================================
       // RANGOS INVÁLIDOS CP9/2026
@@ -845,243 +977,554 @@
       };
       const esInv = (d, n) => (R[d] || []).some(([a, b]) => n >= a && n <= b);
 
-      let currentBase64 = null,
-        dMan = null;
+      let imgData = null,
+        dMan = null,
+        corrDenom = null;
+      let ocrWorker = null;
+
+      // Precargar Tesseract al inicio (en background)
+      (async () => {
+        try {
+          ocrWorker = await Tesseract.createWorker("eng", 1, {
+            logger: () => {},
+          });
+        } catch (e) {
+          console.warn("Tesseract precarga fallida, se reintentará al usar");
+        }
+      })();
 
       // ================================================================
       // FOTO
       // ================================================================
-      function onFoto(input) {
-        const file = input.files[0];
-        if (!file) return;
+      function abrirCam() {
+        document.getElementById("fileIn").click();
+      }
 
+      function abrirGaleria() {
+        const t = document.createElement("input");
+        t.type = "file";
+        t.accept = "image/*";
+        t.onchange = (e) => onFotoFile(e.target.files[0]);
+        t.click();
+      }
+
+      function onFoto(input) {
+        if (input.files[0]) onFotoFile(input.files[0]);
+      }
+
+      function onFotoFile(file) {
+        if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-          // Mostrar preview
-          const img = document.getElementById("preview");
-          img.src = e.target.result;
+          imgData = e.target.result;
+          const img = document.getElementById("prev");
+          img.src = imgData;
           img.style.display = "block";
-          document.getElementById("fzPlaceholder").style.display = "none";
-          document.getElementById("fotoZone").classList.add("has-img");
+          document.getElementById("fzp").style.display = "none";
+          document.getElementById("fz").classList.add("has");
           document.getElementById("btnVer").classList.add("show");
-
-          // Guardar base64 (sin el prefijo data:image/...;base64,)
-          currentBase64 = e.target.result.split(",")[1];
-
-          // Ocultar resultados anteriores
-          document.getElementById("rFoto").className = "result";
-          document.getElementById("rFoto").innerHTML = "";
-          document.getElementById("btnNueva").className = "btn-nueva";
-          document.getElementById("anlState").className = "anl-state";
+          // Limpiar resultados anteriores
+          resetResultados();
         };
         reader.readAsDataURL(file);
       }
 
-      function abrirGaleria() {
-        // Abrir galería sin capture para seleccionar imagen existente
-        const tmp = document.createElement("input");
-        tmp.type = "file";
-        tmp.accept = "image/*";
-        tmp.onchange = (e) => {
-          document.getElementById("fileIn").files;
-          onFoto(e.target);
-        };
-        tmp.click();
+      function resetResultados() {
+        document.getElementById("rFoto").className = "result";
+        document.getElementById("rFoto").innerHTML = "";
+        document.getElementById("corrBox").className = "corr-box";
+        document.getElementById("btnNueva").className = "btn-nueva";
+        document.getElementById("ocrDebug").className = "ocr-debug";
+        document.getElementById("ocrProg").className = "ocr-prog";
       }
 
-      async function verificarFoto() {
-        if (!currentBase64) {
-          alert("Primero toma una foto del billete");
+      // ================================================================
+      // PROCESAMIENTO PRINCIPAL
+      // ================================================================
+      async function procesarFoto() {
+        if (!imgData) {
+          alert("Primero toma una foto");
           return;
         }
 
         const btnVer = document.getElementById("btnVer");
         btnVer.disabled = true;
+        resetResultados();
 
-        // Mostrar estado de análisis
-        const st = document.getElementById("anlState");
-        st.className = "anl-state show scanning";
-        document.getElementById("anlTxt").textContent = "Analizando billete...";
+        // Mostrar barra de progreso
+        document.getElementById("ocrProg").className = "ocr-prog show";
+        setProgreso(5, "Cargando imagen...");
 
         try {
-          // Llamar a Claude API con la imagen
-          const resultado = await analizarConClaude(currentBase64);
-          mostrarResultado(resultado);
-        } catch (e) {
-          st.className = "anl-state show warn";
-          document.getElementById("anlTxt").textContent =
-            "Error al analizar: " + e.message;
-          console.error(e);
-        }
+          // 1. Cargar imagen en canvas
+          const img = await cargarImagen(imgData);
+          setProgreso(15, "Preprocesando imagen...");
 
-        btnVer.disabled = false;
+          // 2. Generar múltiples versiones preprocesadas
+          const versiones = preprocesarImagen(img);
+          setProgreso(35, "Ejecutando OCR...");
+
+          // 3. Iniciar worker si no está listo
+          if (!ocrWorker) {
+            setProgreso(20, "Iniciando motor OCR...");
+            ocrWorker = await Tesseract.createWorker("eng", 1, {
+              logger: () => {},
+            });
+          }
+
+          // 4. Ejecutar OCR en múltiples versiones y combinar resultados
+          const textos = await ejecutarOCR(versiones, setProgreso);
+          setProgreso(85, "Extrayendo datos...");
+
+          // 5. Extraer número de serie y denominación del texto
+          const resultado = extraerDatos(textos);
+          setProgreso(100, "Listo");
+
+          // Mostrar texto crudo para transparencia
+          document.getElementById("ocrRaw").textContent = textos
+            .join("\n---\n")
+            .substring(0, 500);
+          document.getElementById("ocrDebug").className = "ocr-debug show";
+
+          // 6. Mostrar resultado
+          setTimeout(() => {
+            document.getElementById("ocrProg").className = "ocr-prog";
+            mostrarResultado(resultado);
+            btnVer.disabled = false;
+          }, 400);
+        } catch (e) {
+          console.error(e);
+          setProgreso(100, "Error: " + e.message);
+          document.getElementById("ocrProg").className = "ocr-prog";
+          mostrarResultado({
+            error: "No se pudo procesar la imagen: " + e.message,
+          });
+          btnVer.disabled = false;
+        }
       }
 
       // ================================================================
-      // LLAMADA A CLAUDE API — analiza la imagen del billete
+      // CARGAR IMAGEN EN CANVAS
       // ================================================================
-      async function analizarConClaude(base64img) {
-        const prompt = `Eres un asistente de verificación de billetes bolivianos.
+      function cargarImagen(src) {
+        return new Promise((res, rej) => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.onerror = rej;
+          img.src = src;
+        });
+      }
 
-Analiza esta imagen de un billete boliviano y extrae:
-1. La DENOMINACIÓN (10, 20 o 50 bolivianos)
-2. El NÚMERO DE SERIE completo (es un número de 8-9 dígitos seguido de la letra B, por ejemplo: "87654321 B")
-3. Si la SERIE es "B" (la letra que aparece después del número)
+      // ================================================================
+      // PREPROCESAMIENTO — genera varias versiones optimizadas para OCR
+      // ================================================================
+      function preprocesarImagen(imgEl) {
+        const cv = document.getElementById("cv");
+        const ctx = cv.getContext("2d", { willReadFrequently: true });
+        const versiones = [];
 
-IMPORTANTE: Solo me interesan billetes de Serie B. Si el billete no es Serie B, indícalo.
+        // Escalar a ancho fijo 1600px (mejor balance resolución/velocidad)
+        const W = 1600;
+        const scale = W / imgEl.naturalWidth;
+        const H = Math.round(imgEl.naturalHeight * scale);
+        cv.width = W;
+        cv.height = H;
+        ctx.drawImage(imgEl, 0, 0, W, H);
 
-Responde ÚNICAMENTE con este JSON sin texto adicional:
-{
-  "denominacion": 50,
-  "numero_serie": 87654321,
-  "serie": "B",
-  "serie_es_B": true,
-  "confianza": "alta",
-  "error": null
-}
+        // --- VERSION 1: Imagen completa en escala de grises con contraste alto ---
+        {
+          const d = ctx.getImageData(0, 0, W, H);
+          aplicarGris(d);
+          aumentarContraste(d, 60);
+          ctx.putImageData(d, 0, 0);
+          versiones.push(cv.toDataURL("image/png"));
+        }
 
-Si no puedes leer algún dato, usa null en ese campo.
-Si el billete no es Serie B, pon serie_es_B: false.
-Si la imagen no es un billete, pon error: "No es un billete boliviano".`;
+        // --- VERSION 2: Solo franja inferior izquierda (número de serie en billetes bolivianos) ---
+        // El número de serie está en la parte inferior izquierda y superior derecha
+        ctx.drawImage(imgEl, 0, 0, W, H);
+        {
+          // Franja completa horizontal del 65% inferior hasta el 85% vertical
+          const sy = Math.floor(H * 0.6),
+            sh = Math.floor(H * 0.28);
+          const sub = ctx.getImageData(0, sy, W, sh);
+          const cv2 = crearCanvas(W * 2, sh * 2);
+          const ctx2 = cv2.getContext("2d");
+          // Escalar x2 para más detalle
+          const tmp = document.createElement("canvas");
+          tmp.width = W;
+          tmp.height = sh;
+          tmp.getContext("2d").putImageData(sub, 0, 0);
+          ctx2.drawImage(tmp, 0, 0, W * 2, sh * 2);
+          const d2 = ctx2.getImageData(0, 0, W * 2, sh * 2);
+          aplicarGris(d2);
+          umbralOtsu(d2);
+          ctx2.putImageData(d2, 0, 0);
+          versiones.push(cv2.toDataURL("image/png"));
+        }
 
-        const resp = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 300,
-            messages: [
-              {
-                role: "user",
-                content: [
-                  {
-                    type: "image",
-                    source: {
-                      type: "base64",
-                      media_type: "image/jpeg",
-                      data: base64img,
-                    },
-                  },
-                  { type: "text", text: prompt },
-                ],
-              },
-            ],
-          }),
+        // --- VERSION 3: Franja superior derecha (número de serie también aparece ahí) ---
+        ctx.drawImage(imgEl, 0, 0, W, H);
+        {
+          const sy = Math.floor(H * 0.04),
+            sh = Math.floor(H * 0.22);
+          const sx = Math.floor(W * 0.45);
+          const sub = ctx.getImageData(sx, sy, W - sx, sh);
+          const cw = (W - sx) * 2,
+            ch = sh * 2;
+          const cv2 = crearCanvas(cw, ch);
+          const ctx2 = cv2.getContext("2d");
+          const tmp = document.createElement("canvas");
+          tmp.width = W - sx;
+          tmp.height = sh;
+          tmp.getContext("2d").putImageData(sub, 0, 0);
+          ctx2.drawImage(tmp, 0, 0, cw, ch);
+          const d2 = ctx2.getImageData(0, 0, cw, ch);
+          aplicarGris(d2);
+          umbralOtsu(d2);
+          ctx2.putImageData(d2, 0, 0);
+          versiones.push(cv2.toDataURL("image/png"));
+        }
+
+        // --- VERSION 4: Imagen completa binarizada (umbral Otsu) ---
+        ctx.drawImage(imgEl, 0, 0, W, H);
+        {
+          const d = ctx.getImageData(0, 0, W, H);
+          aplicarGris(d);
+          umbralOtsu(d);
+          ctx.putImageData(d, 0, 0);
+          versiones.push(cv.toDataURL("image/png"));
+        }
+
+        // --- VERSION 5: Invertida (fondo oscuro, texto claro) ---
+        ctx.drawImage(imgEl, 0, 0, W, H);
+        {
+          const d = ctx.getImageData(0, 0, W, H);
+          aplicarGris(d);
+          umbralOtsu(d);
+          invertir(d);
+          ctx.putImageData(d, 0, 0);
+          versiones.push(cv.toDataURL("image/png"));
+        }
+
+        return versiones;
+      }
+
+      function crearCanvas(w, h) {
+        const c = document.createElement("canvas");
+        c.width = w;
+        c.height = h;
+        return c;
+      }
+
+      function aplicarGris(imgd) {
+        const d = imgd.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const g = Math.round(
+            0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2],
+          );
+          d[i] = d[i + 1] = d[i + 2] = g;
+        }
+      }
+
+      function aumentarContraste(imgd, factor) {
+        const d = imgd.data,
+          f = (259 * (factor + 255)) / (255 * (259 - factor));
+        for (let i = 0; i < d.length; i += 4) {
+          d[i] = clamp(f * (d[i] - 128) + 128);
+          d[i + 1] = clamp(f * (d[i + 1] - 128) + 128);
+          d[i + 2] = clamp(f * (d[i + 2] - 128) + 128);
+        }
+      }
+
+      function umbralOtsu(imgd) {
+        const d = imgd.data,
+          n = d.length / 4;
+        const hist = new Int32Array(256);
+        for (let i = 0; i < n; i++) hist[d[i * 4]]++;
+        let sum = 0;
+        for (let i = 0; i < 256; i++) sum += i * hist[i];
+        let wB = 0,
+          sumB = 0,
+          max = 0,
+          thr = 128;
+        for (let t = 0; t < 256; t++) {
+          wB += hist[t];
+          if (!wB) continue;
+          const wF = n - wB;
+          if (!wF) break;
+          sumB += t * hist[t];
+          const mB = sumB / wB,
+            mF = (sum - sumB) / wF;
+          const s = wB * wF * (mB - mF) * (mB - mF);
+          if (s > max) {
+            max = s;
+            thr = t;
+          }
+        }
+        for (let i = 0; i < d.length; i += 4) {
+          const v = d[i] > thr ? 255 : 0;
+          d[i] = d[i + 1] = d[i + 2] = v;
+        }
+      }
+
+      function invertir(imgd) {
+        const d = imgd.data;
+        for (let i = 0; i < d.length; i += 4) {
+          d[i] = 255 - d[i];
+          d[i + 1] = 255 - d[i + 1];
+          d[i + 2] = 255 - d[i + 2];
+        }
+      }
+
+      function clamp(v) {
+        return Math.max(0, Math.min(255, Math.round(v)));
+      }
+
+      // ================================================================
+      // OCR — ejecutar en múltiples versiones con configuraciones distintas
+      // ================================================================
+      async function ejecutarOCR(versiones, onProg) {
+        const textos = [];
+        // Configuraciones a probar: PSM 3 (auto), PSM 6 (bloque), PSM 11 (texto disperso)
+        const configs = [
+          {
+            psm: "3",
+            whitelist:
+              "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ",
+          },
+          { psm: "6", whitelist: "0123456789 B" },
+          {
+            psm: "11",
+            whitelist:
+              "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ",
+          },
+        ];
+
+        const total = versiones.length * configs.length;
+        let done = 0;
+
+        for (const ver of versiones) {
+          for (const cfg of configs) {
+            try {
+              await ocrWorker.setParameters({
+                tessedit_char_whitelist: cfg.whitelist,
+                tessedit_pageseg_mode: cfg.psm,
+              });
+              const {
+                data: { text },
+              } = await ocrWorker.recognize(ver);
+              if (text.trim()) textos.push(text);
+            } catch (e) {
+              console.warn("OCR versión falló:", e);
+            }
+            done++;
+            onProg(
+              35 + Math.round((done / total) * 50),
+              "Analizando (" + done + "/" + total + ")...",
+            );
+          }
+        }
+
+        return textos;
+      }
+
+      // ================================================================
+      // EXTRACCIÓN DE DATOS — buscar número de serie y denominación
+      // ================================================================
+      function extraerDatos(textos) {
+        const todo = textos.join(" ").replace(/\n/g, " ");
+
+        // ---- NÚMERO DE SERIE ----
+        // Patrón principal: 8-9 dígitos seguido de espacio y B (o precedido de B)
+        // Ejemplos reales: "87280145 B", "B 91646549", "96650001B"
+        let serie = null;
+
+        // Patrón 1: número seguido de B o b
+        const p1 = todo.match(/\b(\d{7,9})\s*[Bb]\b/g) || [];
+        // Patrón 2: B seguido de número
+        const p2 = todo.match(/\b[Bb]\s*(\d{7,9})\b/g) || [];
+        // Patrón 3: cualquier secuencia de 8-9 dígitos
+        const p3 = todo.match(/\b\d{8,9}\b/g) || [];
+
+        // Combinar candidatos
+        const candidatos = [];
+        [...p1, ...p2].forEach((m) => {
+          const n = parseInt(m.replace(/[^0-9]/g, ""));
+          if (n > 10000000) candidatos.push(n);
+        });
+        p3.forEach((m) => {
+          const n = parseInt(m);
+          if (n > 10000000) candidatos.push(n);
         });
 
-        if (!resp.ok) {
-          const err = await resp.json();
-          throw new Error(err.error?.message || "Error API: " + resp.status);
+        if (candidatos.length > 0) {
+          // Priorizar el que coincida con algún rango conocido
+          for (const n of candidatos) {
+            for (const d of [50, 20, 10]) {
+              if (esInv(d, n)) {
+                serie = n;
+                break;
+              }
+            }
+            if (serie) break;
+          }
+          // Si ninguno coincide, tomar el primero válido
+          if (!serie) serie = candidatos[0];
         }
 
-        const data = await resp.json();
-        const txt = data.content[0].text.trim();
+        // ---- DENOMINACIÓN ----
+        let denom = null;
 
-        // Parsear JSON de la respuesta
-        let json;
-        try {
-          const clean = txt.replace(/```json|```/g, "").trim();
-          json = JSON.parse(clean);
-        } catch (e) {
-          throw new Error("No se pudo leer la respuesta de análisis");
+        // Buscar patrones de denominación en el texto
+        // Billetes bolivianos tienen texto como "CINCUENTA BOLIVIANOS", "VEINTE", "DIEZ"
+        if (/CINCUENTA|cincuenta|50/.test(todo)) denom = 50;
+        else if (/VEINTE|veinte|20/.test(todo)) denom = 20;
+        else if (/DIEZ|diez|10/.test(todo)) denom = 10;
+
+        // Si no encontró por texto, inferir desde el número de serie
+        if (!denom && serie) {
+          for (const d of [50, 20, 10]) {
+            // Chequear si el número está en rango o cercano a algún rango
+            if (
+              (R[d] || []).some(
+                ([a, b]) => serie >= a - 2000000 && serie <= b + 2000000,
+              )
+            ) {
+              denom = d;
+              break;
+            }
+          }
         }
 
-        return json;
+        // ---- DETECTAR SERIE B ----
+        // Buscar la letra B cerca del número de serie
+        const esSB =
+          todo.includes(" B ") ||
+          todo.includes("B ") ||
+          /\d\s*B/.test(todo) ||
+          /B\s*\d/.test(todo);
+
+        return { serie, denom, esSB, textoCompleto: todo };
       }
 
       // ================================================================
       // MOSTRAR RESULTADO
       // ================================================================
-      function mostrarResultado(json) {
-        const st = document.getElementById("anlState");
+      function mostrarResultado(datos) {
         const el = document.getElementById("rFoto");
 
-        // Error: imagen no es billete
-        if (json.error) {
-          st.className = "anl-state";
+        if (datos.error) {
           el.className = "result warn";
-          el.innerHTML = `
-      <div class="r-ico">⚠️</div>
-      <div class="r-ttl">No reconocido</div>
-      <div class="r-txt">${json.error}<br>Asegúrate de fotografiar un billete boliviano con buena iluminación.</div>`;
+          el.innerHTML = `<div class="r-ico">⚠️</div><div class="r-ttl">Error</div><div class="r-txt">${datos.error}</div>`;
+          document.getElementById("corrBox").className = "corr-box show";
           document.getElementById("btnNueva").className = "btn-nueva show";
           return;
         }
 
-        // No es Serie B
-        if (json.serie_es_B === false) {
-          st.className = "anl-state";
+        const { serie, denom, esSB } = datos;
+
+        // No se pudo leer
+        if (!serie) {
           el.className = "result warn";
-          el.innerHTML = `
-      <div class="r-ico">ℹ️</div>
-      <div class="r-ttl">No es Serie B</div>
-      <div class="r-txt">Este billete es de la serie <strong>${json.serie || "desconocida"}</strong>. Solo los billetes de <strong>Serie B</strong> fueron anulados según el CP9/2026.<br>Este billete es válido.</div>
-      <div class="r-ficha">
-        <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${json.denominacion || "?"}</span></div>
-        <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${json.numero_serie || "?"}</span></div>
-        <div class="r-row"><span class="r-key">Serie</span><span class="r-val">${json.serie || "?"}</span></div>
-      </div>`;
+          el.innerHTML = `<div class="r-ico">🔍</div><div class="r-ttl">No se pudo leer</div><div class="r-txt">El OCR no detectó el número de serie.<br>Intenta con mejor iluminación, más cerca, o ingresa el número manualmente abajo.</div>`;
+          document.getElementById("corrBox").className = "corr-box show";
           document.getElementById("btnNueva").className = "btn-nueva show";
           return;
         }
 
-        // Sin datos suficientes
-        if (!json.denominacion || !json.numero_serie) {
-          st.className = "anl-state show warn";
-          document.getElementById("anlTxt").textContent =
-            "No se pudo leer el billete. Intenta con mejor iluminación o más cerca.";
-          document.getElementById("btnNueva").className = "btn-nueva show";
-          return;
-        }
+        // Prellenar corrección manual con lo que se detectó
+        if (denom) preselectCorrDenom(denom);
+        document.getElementById("corrInp").value = serie;
 
-        st.className = "anl-state";
-
-        const denom = parseInt(json.denominacion);
-        const serie = parseInt(json.numero_serie);
-        const invalido = esInv(denom, serie);
+        const invalido = denom ? esInv(denom, serie) : false;
 
         if (invalido) {
           el.className = "result bad";
           el.innerHTML = `
       <div class="r-ico">⛔</div>
       <div class="r-ttl">BILLETE INVÁLIDO</div>
-      <div class="r-txt">Este billete <strong>NO tiene valor legal</strong>.<br>Su número de serie está en la lista de billetes Serie B anulados por el Banco Central de Bolivia según el Comunicado CP9/2026 del 28 de febrero de 2026.</div>
+      <div class="r-txt">Este billete <strong>NO tiene valor legal</strong>.<br>Número de serie anulado por el BCB según CP9/2026.</div>
       <div class="r-ficha">
         <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom}</span></div>
         <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div>
         <div class="r-row"><span class="r-key">Serie</span><span class="r-val">B ❌</span></div>
-        <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO</span></div>
+        <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO CP9/2026</span></div>
       </div>`;
         } else {
           el.className = "result ok";
           el.innerHTML = `
       <div class="r-ico">✅</div>
       <div class="r-ttl">BILLETE VÁLIDO</div>
-      <div class="r-txt">Este número de serie no aparece en la lista de billetes anulados del CP9/2026.</div>
+      <div class="r-txt">Este número no aparece en la lista de billetes anulados del CP9/2026.</div>
       <div class="r-ficha">
-        <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom}</span></div>
+        <div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs. ${denom || "?"}</span></div>
         <div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div>
         <div class="r-row"><span class="r-key">Serie</span><span class="r-val">B ✓</span></div>
         <div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#50ffaa">VÁLIDO</span></div>
       </div>`;
         }
 
+        document.getElementById("corrBox").className = "corr-box show";
         document.getElementById("btnNueva").className = "btn-nueva show";
         el.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
+      // ================================================================
+      // CORRECCIÓN MANUAL
+      // ================================================================
+      function setCorrDenom(v, el) {
+        corrDenom = v;
+        document
+          .querySelectorAll(".corr-denom-btn")
+          .forEach((b) => b.classList.remove("on"));
+        el.classList.add("on");
+      }
+      function preselectCorrDenom(v) {
+        document.querySelectorAll(".corr-denom-btn").forEach((b) => {
+          const val = parseInt(b.querySelector(".cm").textContent);
+          if (val === v) {
+            b.classList.add("on");
+            corrDenom = v;
+          } else b.classList.remove("on");
+        });
+      }
+      function verificarManualCorr() {
+        const val = document.getElementById("corrInp").value.trim();
+        if (!corrDenom) {
+          alert("Selecciona la denominación");
+          return;
+        }
+        if (!val) {
+          alert("Ingresa el número de serie");
+          return;
+        }
+        const serie = parseInt(val),
+          denom = corrDenom;
+        const inv = esInv(denom, serie);
+        const el = document.getElementById("rFoto");
+        el.className = "result " + (inv ? "bad" : "ok");
+        el.innerHTML = inv
+          ? `<div class="r-ico">⛔</div><div class="r-ttl">BILLETE INVÁLIDO</div><div class="r-txt">Número anulado por el BCB según CP9/2026.</div><div class="r-ficha"><div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs.${denom}</span></div><div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div><div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO</span></div></div>`
+          : `<div class="r-ico">✅</div><div class="r-ttl">BILLETE VÁLIDO</div><div class="r-txt">No aparece en la lista de billetes anulados.</div><div class="r-ficha"><div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs.${denom}</span></div><div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div><div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#50ffaa">VÁLIDO</span></div></div>`;
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
       function nuevaFoto() {
-        currentBase64 = null;
+        imgData = null;
         document.getElementById("fileIn").value = "";
-        document.getElementById("preview").src = "";
-        document.getElementById("preview").style.display = "none";
-        document.getElementById("fzPlaceholder").style.display = "flex";
-        document.getElementById("fotoZone").classList.remove("has-img");
+        document.getElementById("prev").src = "";
+        document.getElementById("prev").style.display = "none";
+        document.getElementById("fzp").style.display = "flex";
+        document.getElementById("fz").classList.remove("has");
         document.getElementById("btnVer").classList.remove("show");
-        document.getElementById("rFoto").className = "result";
-        document.getElementById("rFoto").innerHTML = "";
-        document.getElementById("btnNueva").className = "btn-nueva";
-        document.getElementById("anlState").className = "anl-state";
+        resetResultados();
+      }
+
+      function setProgreso(pct, lbl, txt = "") {
+        document.getElementById("progBar").style.width = pct + "%";
+        document.getElementById("progLbl").textContent = lbl;
+        if (txt) document.getElementById("progTxt").textContent = txt;
       }
 
       // ================================================================
@@ -1096,7 +1539,6 @@ Si la imagen no es un billete, pon error: "No es un billete boliviano".`;
       }
       function cm() {
         document.getElementById("sinp").value = "";
-        document.getElementById("sinp").focus();
         const r = document.getElementById("rMan");
         r.className = "result";
         r.innerHTML = "";
@@ -1104,21 +1546,21 @@ Si la imagen no es un billete, pon error: "No es un billete boliviano".`;
       function vm() {
         const val = document.getElementById("sinp").value.trim();
         if (!dMan) {
-          alert("⚠️ Selecciona la denominación");
+          alert("Selecciona la denominación");
           return;
         }
         if (!val) {
-          alert("⚠️ Ingresa el número de serie");
+          alert("Ingresa el número de serie");
           return;
         }
-        const denom = dMan,
-          serie = parseInt(val);
-        const inv = esInv(denom, serie);
+        const d = dMan,
+          s = parseInt(val),
+          inv = esInv(d, s);
         const el = document.getElementById("rMan");
         el.className = "result " + (inv ? "bad" : "ok");
         el.innerHTML = inv
-          ? `<div class="r-ico">⛔</div><div class="r-ttl">BILLETE INVÁLIDO</div><div class="r-txt">Número anulado por el BCB según CP9/2026.</div><div class="r-ficha"><div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs.${denom}</span></div><div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div><div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO</span></div></div>`
-          : `<div class="r-ico">✅</div><div class="r-ttl">BILLETE VÁLIDO</div><div class="r-txt">No aparece en la lista de billetes anulados.</div><div class="r-ficha"><div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs.${denom}</span></div><div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${serie}</span></div><div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#50ffaa">VÁLIDO</span></div></div>`;
+          ? `<div class="r-ico">⛔</div><div class="r-ttl">INVÁLIDO</div><div class="r-txt">Anulado por BCB — CP9/2026.</div><div class="r-ficha"><div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs.${d}</span></div><div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${s}</span></div><div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#ff6060">ANULADO</span></div></div>`
+          : `<div class="r-ico">✅</div><div class="r-ttl">VÁLIDO</div><div class="r-txt">No aparece en billetes anulados.</div><div class="r-ficha"><div class="r-row"><span class="r-key">Denominación</span><span class="r-val">Bs.${d}</span></div><div class="r-row"><span class="r-key">Nº de Serie</span><span class="r-val">${s}</span></div><div class="r-row"><span class="r-key">Estado</span><span class="r-val" style="color:#50ffaa">VÁLIDO</span></div></div>`;
       }
 
       // ================================================================
